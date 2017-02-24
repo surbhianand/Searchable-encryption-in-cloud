@@ -43,16 +43,6 @@
      
 				                    </form>
 				                    
-				                    <form role="form" action="FuzzySearchQuery" method="post" class="search-form">
-				                    	<div class="form-group">
-				                    		<label class="sr-only" for="form-search">Enter Keyword here</label>
-				                        	<input type="text" name="keyword" placeholder="Keyword..." class="form-search form-control" id="searchform-keyword">
-				                        </div>
-				                     
-				                        <button type="submit" class="btn" id="search">Fuzzy keyword Search</button>
-     
-				                    </form>
-				                    
 			                   </div>
 </body>
 </html>

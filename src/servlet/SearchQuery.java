@@ -2,6 +2,7 @@ package servlet;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -18,6 +19,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.Scanner;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
@@ -35,6 +37,8 @@ import org.cloudbus.cloudsim.core.CloudSim;
 import org.cloudbus.cloudsim.examples.CloudFile;
 import org.cloudbus.cloudsim.examples.CloudHarddriveStorage;
 
+import classes.BloomFilter;
+import classes.Pair;
 import classes.Stopwords;
 import classes.Trieuser;
 
@@ -82,25 +86,156 @@ public class SearchQuery extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		
+		String key=request.getParameter("keyword");
 		System.out.print("finished reading serialaized bloomfilter");
-		FileInputStream inFile = new FileInputStream("SerializedBloomFilter.txt");
+		FileInputStream inFile = new FileInputStream("SerializedBloomFilterNew.txt");
 		BufferedInputStream bin = new BufferedInputStream(inFile);
         int character;
-        String temptext="";
-        while((character=bin.read())!=-1) {
-            temptext = temptext + (char)character;
+        
+        double falsePositiveProbability = 0.1;
+        int expectedSize = 100;
+    	 BloomFilter<String> bloomFilter = new BloomFilter<String>(falsePositiveProbability, expectedSize);
+    	
+    	
+        
+        while((character=bin.read())!=-1)
+        {
+        	String tempkeyword="";
+        while((character=bin.read())!='>') {
+            tempkeyword = tempkeyword + (char)character;
+        }
+        System.out.print("The keyword is "+tempkeyword+"\n");
+       
+        while((character=bin.read())!='{') {
+          
+        }
+        String tempfilename="";
+        while((character=bin.read())!=',') {
+        	tempfilename = tempfilename + (char)character;   
+        }
+        
+        System.out.print("The file name is "+tempfilename+"\n");
+        String tempcount="";
+        while((character=bin.read())!='}') {
+        	tempcount = tempcount + (char)character;   
+        }
+        System.out.print("The count is "+tempcount+"\n");
+        while((character=bin.read())!=')') {
+            
+        }
+        List<Pair<String, Integer>> l=new ArrayList<Pair<String,Integer>>();
+        
+        Pair<String, Integer> p=new Pair<String,Integer>(tempfilename,Integer.parseInt(tempcount));
+        l.add(p);
+        
+        
+        bloomFilter.add(tempkeyword,l);
+        
         }
         bin.close();
         inFile.close();
-        Log.printLine(temptext);
+      //  Log.printLine(temptext);
         System.out.print("finished reading serialaized bloomfilter");
+        //System.out.print(""+bloomFilter);
+        
+       search(key,bloomFilter);
+       
         
         
         
-	        
-	        
-	        
+	}
+	
+	public void search(String key,BloomFilter<String> bloomFilter)
+	{
+		 HashMap<String,Integer> hm=new HashMap<String,Integer>();
+		 String input = key;
+		 input.toLowerCase();
+		 check_for_word();
+		 Queue q = new LinkedList();
+		 q.add(input);
+		 q.add("$");
+		 int count=0;
+		 while(!q.isEmpty())
+		 {
+			 Object obj = new Object();
+			 obj  = q.remove();
+			 String temp = obj.toString();
+			 if(temp.equals("$"))
+			 {
+				 if(q.size()!=0)
+				 {
+					 count=count+1;
+					 q.add("$");
+				 }
+				 if(count>5)
+					 break;
+			 }
+			 else
+			 {
+				 if (bloomFilter.contains(temp)) { 
+			            System.out.println("\n"+"present");
+			            
+			            
+			        }
+				 
+				 
+				 hm.put(temp, count);
+				 //delete
+				 for(int i=0;i<temp.length();i++)
+				 {
+					 String temp2 = "";
+					 for(int j=0;j<temp.length();j++)
+					 {
+						 if(i!=j)
+						 {
+							 temp2 = temp2 + temp.charAt(j);
+						 }
+					 }
+					 if(!hm.containsKey(temp2) && temp2.length() > 0 && wd.containsKey(temp2))
+					 {
+						 q.add(temp2);
+					 }
+				 }
+				 //replace
+				 for(int i=0;i<temp.length();i++)
+				 {
+					 String left = "";
+					 String right = "";
+					 for(int j=0;j<i;j++)
+						 left=left+temp.charAt(j);
+					 for(int j=i+1;j<temp.length();j++)
+						 right=right+temp.charAt(j);
+					 for(char j='a';j<='z';j++)
+					 {
+						 String temp2 = left + j + right;
+						 if(!hm.containsKey(temp2)&& temp2.length()>0 && wd.containsKey(temp2))
+							 q.add(temp2);
+					 }
+				 }
+				 //insert
+				 String lefti="";
+				 for(int i=0;i<temp.length();i++)
+				 {
+					 String right = temp.substring(i);
+					 for(char j='a';j<='z';j++)
+					 {
+						 String temp2 = lefti + j + right;
+						 if(!hm.containsKey(temp2)&&temp2.length()>0 && wd.containsKey(temp2))
+							 q.add(temp2);
+					 }
+					 lefti = lefti + temp.charAt(i);
+				 }
+				 for(char j='a';j<='z';j++)
+				 {
+					 String temp2 = lefti + j ;
+					 if(!hm.containsKey(temp2)&&temp2.length()>0 && wd.containsKey(temp2))
+						 q.add(temp2);
+				 }
+			 }
+		 }
+		
+		
+		
 	}
 	
 	   public static void setKey(String myKey) 
@@ -212,3 +347,5 @@ public class SearchQuery extends HttpServlet {
 	    
 	    
 }
+
+
