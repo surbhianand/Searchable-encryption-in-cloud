@@ -4,6 +4,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
@@ -14,7 +15,9 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
@@ -32,6 +35,9 @@ import org.cloudbus.cloudsim.core.CloudSim;
 import org.cloudbus.cloudsim.examples.CloudFile;
 import org.cloudbus.cloudsim.examples.CloudHarddriveStorage;
 
+import classes.Stopwords;
+import classes.Trieuser;
+
 /**
  * Servlet implementation class SearchQuery
  */
@@ -40,6 +46,8 @@ public class SearchQuery extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static SecretKeySpec secretKey;
     private static byte[] key;
+    public static HashMap<String,Integer> wd=new HashMap<String,Integer>();
+    public static Trieuser trieUser;
        
     /**
      * @see HttpServlet#HttpServlet()
@@ -48,7 +56,20 @@ public class SearchQuery extends HttpServlet {
         super();
         // TODO Auto-generated constructor stub
     }
+    public static boolean check_for_word() {
+        // System.out.println(word);
+        try {
+            BufferedReader in = new BufferedReader(new FileReader("D:\\major\\abc\\words.txt"));
+            String str;
+            while ((str = in.readLine()) != null) {
+                wd.put(str,1);
+            }
+            in.close();
+        } catch (IOException e) {
+        }
 
+        return false;
+    }
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -61,88 +82,22 @@ public class SearchQuery extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		String keyword = request.getParameter("keyword");  
-		int num_user = 1;
-		Calendar calendar = Calendar.getInstance();
-		boolean trace_flag = false;
-		CloudSim.init(num_user, calendar, trace_flag);
-		//******************************************************
-		//Creating Storages
-		CloudHarddriveStorage hdst = null;
-		try {
-			hdst = new CloudHarddriveStorage(50);
-		} catch (ParameterException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		double hdstCap = hdst.getCapacity();
-		double hdstAvailSpace = hdst.getAvailableSpace();
 		
-		
-		 Log.printLine("reading out the list of files while searching");
-		    
-		    FileInputStream inFile = new FileInputStream("ListOfFiles.txt");
-			BufferedInputStream bin = new BufferedInputStream(inFile);
-	        int character;
-	        String temptext="";
-	        List<String> li=new ArrayList<String>();
-	        
-	        while((character=bin.read())!=-1) {
-	        	char temp=(char)character;
-	        	
-	        	if(temp!='\n')
-	            temptext = temptext + (char)character;
-	        	else
-	        	{
-	        		li.add(temptext);
-	        		temptext="";
-	        	}
-	        		
-	        }
-	        bin.close();
-	        inFile.close();
-	        
-	        Log.printLine("List of files"+li);
-	        
-	      int i;
-	      String cipherKey = "pro"; // 128 bit key
-	       
-	        for(i=0;i<li.size();i++)
-	        {
-	        	String path=li.get(i);
-	        	 Log.printLine("storing file in cloud for searching"+path);
-	        	 FileInputStream in = new FileInputStream(path);
-	 			BufferedInputStream bi = new BufferedInputStream(in);
-	 	        int charac = 0;
-	 	        String data="";
-	 	        while((charac=bi.read())!=-1) {
-	 	            data = data + (char)charac;
-	 	        }
-	 	       Log.printLine("file read as "+data);
-	 	        bin.close();
-	 	        inFile.close();
-	 	        
-		          String ciphertext= createCipherText(path,cipherKey);
-		          
-		          HashMap<String,Integer> hm;
-		          hm=buildMap(path,cipherKey);
-		          Log.printLine(""+hm);
-		          CloudFile file2 = null;
-					try {
-						file2 = new CloudFile(path,2);
-					} catch (ParameterException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-						file2.addCipherData(ciphertext, cipherKey,hm);
-						double timetaken = hdst.addCloudFile(file2);
-						
-	        }
-	        CloudSim.startSimulation();
-	        Log.printLine("search startd for keyword "+keyword);
-	        searchWord(hdst,keyword);
-	        
+		System.out.print("finished reading serialaized bloomfilter");
+		FileInputStream inFile = new FileInputStream("SerializedBloomFilter.txt");
+		BufferedInputStream bin = new BufferedInputStream(inFile);
+        int character;
+        String temptext="";
+        while((character=bin.read())!=-1) {
+            temptext = temptext + (char)character;
+        }
+        bin.close();
+        inFile.close();
+        Log.printLine(temptext);
+        System.out.print("finished reading serialaized bloomfilter");
+        
+        
+        
 	        
 	        
 	        
@@ -252,21 +207,8 @@ public class SearchQuery extends HttpServlet {
 			}
 	    }
 	 
-	    public static void searchWord(CloudHarddriveStorage hdst,String text)
-	    {
-	    	List<CloudFile> fileList = hdst.getFileList();
-			for(int i=0;i<fileList.size();i++)
-			{
-				HashMap<String,Integer> hm = fileList.get(i).getUniqueWords();
-				String key = fileList.get(i).getCipherData("cKey");
-				String temp = encrypt(text,key);
-				if(hm.containsKey(temp))
-				{
-					 Log.printLine("keyword found in file "+fileList.get(i));
-					String ciphertext=fileList.get(i).getCipherData("cText");
-					bringText(ciphertext,key);
-				}
-			}
+	   
 	    
-	    }
+	    
+	    
 }

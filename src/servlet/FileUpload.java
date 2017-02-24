@@ -35,6 +35,9 @@ import org.cloudbus.cloudsim.core.CloudSim;
 import org.cloudbus.cloudsim.examples.CloudFile;
 import org.cloudbus.cloudsim.examples.CloudHarddriveStorage;
 
+import classes.Stopwords;
+import classes.Trieuser;
+
 /**
  * Servlet implementation class FileUpload
  */
@@ -120,7 +123,7 @@ public class FileUpload extends HttpServlet {
 	          hm=buildMap(path,cipherKey);
 	          Log.printLine("enctext "+ciphertext);
 	          Log.printLine("file path "+ path);
-	          File log = new File("ListOfFiles.txt");
+	          File log = new File("ListOfFilesNew.txt");
 	        		    try{
 	        		    if(log.exists()==false){
 	        		            System.out.println("We had to make a new file.");
@@ -135,7 +138,7 @@ public class FileUpload extends HttpServlet {
 	          
 	        		    Log.printLine("reading out the list of files");
 	        		    
-	        		    FileInputStream inFile = new FileInputStream("ListOfFiles.txt");
+	        		    FileInputStream inFile = new FileInputStream("ListOfFilesNew.txt");
 	        			BufferedInputStream bin = new BufferedInputStream(inFile);
 	        	        int character;
 	        	        String temptext="";
@@ -146,6 +149,15 @@ public class FileUpload extends HttpServlet {
 	        	        inFile.close();
 	        	        Log.printLine(temptext);
 	        	        Log.printLine("finished");
+	        	        Stopwords s=new Stopwords();
+	        	        
+	        	      
+	        	        try {
+							s.RemoveStopWords(path);
+						} catch (Exception e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
 	        		    
 	          CloudFile file2 = null;
 			try {
