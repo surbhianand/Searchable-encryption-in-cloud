@@ -11,8 +11,12 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.*;
+import java.util.concurrent.TimeoutException;
 
 import org.cloudbus.cloudsim.Log;
+
+import classes.MutableBloomierFilter;
+//import main.java.edu.utexas.ece.mpc.bloomier.Pair;
  
 class TrieNode 
 {
@@ -41,13 +45,21 @@ class TrieNode
  
 class Trie
 {
-    public TrieNode root;
- 
+    public static TrieNode root;
+    
      /* Constructor */
     public Trie()
     {
         root = new TrieNode(' '); 
     }
+   /* public static void bloom(String file){
+		String temp="";
+		System.out.println("Traversing global trie");
+		traverse(root,temp,file);
+		//System.out.println("contain" +bloomFilter.contains("csc"));
+		System.out.println("Serialaing");
+		//serialize();
+	}*/
      /* Function to insert word */
     public void insert(String word)
     {    
@@ -66,6 +78,57 @@ class Trie
         current.count++;
         current.isEnd = true;
     }
+    public static void traverse(TrieNode root,String temp,String file)
+	{
+	    int len = root.childList.size();
+	    if(len==0)
+	    	return ;
+	    for(int i=0;i<len;i++)
+	    {
+	    	TrieNode child = root.childList.get(i);
+	    	String temp2 = temp + child.content;
+	    	if(child.isEnd)
+	    	{
+	    		
+	    		System.out.println("Before adding "+temp2+" "+file+" "+child.count);
+	    		
+	    		Pair<String,Integer> p= new Pair<String, Integer>(file,child.count);
+	    		if(BloomierObject.bloomierFilter!=null){
+	    		 List<Pair<String,Integer>> x=BloomierObject.bloomierFilter.get(temp2);
+	    		if(x!=null){
+	    			x.add(p);
+	    			
+	    			BloomierObject.bloomierFilter.set(temp2,x);	
+	    		}
+	    		else{
+	    			List<Pair<String,Integer>> l= new ArrayList<Pair<String,Integer>>();
+	    			l.add(p);
+	    			BloomierObject.originalMap.put(temp2,l);
+	    			try {
+						BloomierObject.bloomierFilter = new MutableBloomierFilter<String, List<Pair<String,Integer>>>(BloomierObject.originalMap, BloomierObject.originalMap.keySet().size() * 10, 10, 32,
+						        10000);
+					} catch (TimeoutException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} 
+	    		}
+	    		}else
+	    		{
+	    			System.out.println("No bloomier");
+	    			
+	    		}
+	    		/*int plen = plist.size();
+	    		for(i=0;i<plen;i++)
+	    		{
+	    			System.out.println(plist.get(i).getL()+" "+plist.get(i).getR());
+	    		}*/
+	    	}
+	    	traverse(child,temp2,file);
+	    }
+	}
+    
+    
+    
     /* Function to search for word */
     public boolean search(String word)
     {
@@ -106,10 +169,53 @@ class Trie
         }
         current.isEnd = false;
     }
+	/*public static void serialize(){
+		
+		
+		File log = new File("SerializedBloomFilterNew1.txt");
+		 
+		 if(log.exists()==false){
+	            System.out.println("new created at"+log.getAbsolutePath());
+	           
+	    }
+		 if(log.exists()==true){
+			 log.delete();
+	            System.out.println("file alreafy existed"+log.getAbsolutePath());
+	           
+	    }
+		 try {
+			log.createNewFile();
+			PrintWriter out = new PrintWriter(new FileWriter(log, true));
+		
+		 String temp="";
+		 bloomTraverse(root,temp);
+		 out.close();
+		 FileInputStream inFile;
+		 System.out.println("Finally serializable");
+		
+			inFile = new FileInputStream("SerializedBloomFilterNew1.txt");
+			BufferedInputStream bin = new BufferedInputStream(inFile);
+	        int character;
+	        String temptext="";
+	        while((character=bin.read())!=-1) {
+	            temptext = temptext + (char)character;
+	        }
+	        bin.close();
+	        inFile.close();
+	        Log.printLine(temptext);
+	        Log.printLine("finished");
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+			
+
+		
+	}*/
 }    
 
 
-class GlobalTrieNode 
+/*class GlobalTrieNode 
 {
     char content; 
     boolean isEnd; 
@@ -117,7 +223,7 @@ class GlobalTrieNode
     LinkedList<GlobalTrieNode> childList;
     List<Pair<String,Integer>> pairList;
     
-    /* Constructor */
+     Constructor 
     public GlobalTrieNode(char c)
     {
         childList = new LinkedList<GlobalTrieNode>();
@@ -140,12 +246,12 @@ class GlobalTrie
 {
     public GlobalTrieNode root;
  
-     /* Constructor */
+      Constructor 
     public GlobalTrie()
     {
         root = new GlobalTrieNode(' '); 
     }
-     /* Function to insert word */
+      Function to insert word 
     public void insert(String word,Pair<String,Integer> pp)
     {   
         GlobalTrieNode current = root; 
@@ -166,7 +272,7 @@ class GlobalTrie
     }
     
     
-    /* Function to search for word */
+     Function to search for word 
     public boolean search(String word)
     {
         GlobalTrieNode current = root;  
@@ -182,12 +288,11 @@ class GlobalTrie
         return false;
     }
 }    
-/* Class Trie Test */
+ Class Trie Test 
 public class Trieuser
 {
 	static double falsePositiveProbability = 0.1;
     static int expectedSize = 100;
-	static BloomFilter<String> bloomFilter = new BloomFilter<String>(falsePositiveProbability, expectedSize);
 	public static GlobalTrie tg = new GlobalTrie();
 	public static File log = null;
 	public static PrintWriter out;
@@ -203,7 +308,8 @@ public class Trieuser
 	    	if(child.isEnd)
 	    	{
 	    		Pair<String,Integer> pp = new Pair<String,Integer>(name,child.count);
-	    		tg.insert(temp2, pp);
+	    		bloomFilter.add(,);
+	    		//tg.insert(temp2, pp);
 	    	}
 	    	traversefile(child,temp2,name);
 	    }
@@ -216,37 +322,7 @@ public class Trieuser
 		System.out.println("Serialaing");
 		serialize();
 	}
-	public static void serialize(){
-		 log = new File("SerializedBloomFilterNew.txt");
-		 try {
-			log.createNewFile();
-			out = new PrintWriter(new FileWriter(log, true));
-		
-		 String temp="";
-		 bloomTraverse(tg.root,temp);
-		 out.close();
-		 FileInputStream inFile;
-		 System.out.println("Finally serializable");
-		
-			inFile = new FileInputStream("SerializedBloomFilterNew.txt");
-			BufferedInputStream bin = new BufferedInputStream(inFile);
-	        int character;
-	        String temptext="";
-	        while((character=bin.read())!=-1) {
-	            temptext = temptext + (char)character;
-	        }
-	        bin.close();
-	        inFile.close();
-	        Log.printLine(temptext);
-	        Log.printLine("finished");
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-			
 
-		
-	}
 	
 	public static void bloomTraverse(GlobalTrieNode root,String temp)
 	{
@@ -271,7 +347,7 @@ public class Trieuser
 	    		{
 	    			System.out.println("{"+plist.get(i).getL()+"," +plist.get(i).getR() +"}");
 	    			out.append("{"+plist.get(i).getL()+"," +plist.get(i).getR() +"}");
-	    			/*System.out.println(plist.get(i).getL()+" "+plist.get(i).getR());*/
+	    			System.out.println(plist.get(i).getL()+" "+plist.get(i).getR());
 	    		}
 	    		System.out.println(")");
 	    		out.append(")");
@@ -292,7 +368,7 @@ public class Trieuser
 	    	if(child.isEnd)
 	    	{
 	    		
-	    		//System.out.println(temp2+" "+child.count);
+	    		System.out.println(temp2+" "+child.count);
 	    		List<Pair<String,Integer>> plist = child.pairList;
 	    		bloomFilter.add(temp2,child.pairList);
 	    		int plen = plist.size();
@@ -308,7 +384,7 @@ public class Trieuser
 
 	
 	
-   /* public static void main(String[] args)
+    public static void main(String[] args)
     {
         Trie t = new Trie(); 
         t.insert("abcd");
@@ -324,9 +400,10 @@ public class Trieuser
         traversefile(t1.root,temp,"file2");
         temp="";
         globaltraverse(tg.root,temp);
-    }*/
+    }
 
 
 }
 
 
+*/

@@ -2,11 +2,18 @@ package classes;
 
 import java.io.*;
 import java.util.regex.Pattern;
+
+import classes.MutableBloomierFilter;
+
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Scanner;
+import java.util.concurrent.TimeoutException;
 
  
 public class Stopwords {
+	
 	public static String removePunctuationWord(String original) {
 		String result = "";
 		char[] chars = original.toCharArray();
@@ -19,7 +26,7 @@ public class Stopwords {
 	}
 	
 	
-public Trieuser RemoveStopWords(String file) throws Exception
+public void RemoveStopWords(String file) throws Exception
 {
         String a,s,line,token;
         //read the input file
@@ -64,7 +71,7 @@ public Trieuser RemoveStopWords(String file) throws Exception
                  }
              }
              for (String str : wordsList){
-             	System.out.println(str);
+             	//System.out.println(str);
                  iout.write(str);
                  iout.write(" ");
              }   
@@ -83,7 +90,7 @@ public Trieuser RemoveStopWords(String file) throws Exception
         BufferedWriter out = null;
         Stemmer s1 = new Stemmer();
         Trie trie = new Trie(); 
-        Trieuser trieUser=new Trieuser();
+        /*Trieuser trieUser=new Trieuser();*/
         
         try{
         FileReader file_to_read2=new FileReader("intermidiate.txt"); // you can change file path.
@@ -103,15 +110,20 @@ public Trieuser RemoveStopWords(String file) throws Exception
              a.toLowerCase();
              trie.insert(a);
              out.write(a);
-             System.out.println(a);
+            // System.out.println(a);
              out.write(" ");
             }
             out.newLine();
             linesc.close();
         }
         String temp = "";
-        trieUser.traversefile(trie.root,temp,file);
-        trieUser.bloom();
+       // trieUser.traversefile(trie.root,temp,file);
+       
+        
+        trie.traverse(trie.root,temp,file);
+        
+       
+
         } catch (IOException ioe) {
 	   ioe.printStackTrace();
 	}
@@ -124,7 +136,5 @@ public Trieuser RemoveStopWords(String file) throws Exception
 	       System.out.println("Error in closing the BufferedWriter"+ex);
 	    }
 	}
-		return trieUser;
-		
     }
 }

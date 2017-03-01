@@ -71,6 +71,7 @@ public class FileAttribute {
 
 		// set the file creation time. This is absolute time
 		Date date = CloudSim.getSimulationCalendar().getTime();
+		
 		if (date == null) {
 			creationTime = 0;
 		} else {

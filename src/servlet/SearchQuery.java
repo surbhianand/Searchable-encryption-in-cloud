@@ -2,12 +2,15 @@ package servlet;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -37,10 +40,11 @@ import org.cloudbus.cloudsim.core.CloudSim;
 import org.cloudbus.cloudsim.examples.CloudFile;
 import org.cloudbus.cloudsim.examples.CloudHarddriveStorage;
 
-import classes.BloomFilter;
+//import classes.BloomierFilter;
+import classes.BloomierObject;
 import classes.Pair;
+import classes.Stemmer;
 import classes.Stopwords;
-import classes.Trieuser;
 
 /**
  * Servlet implementation class SearchQuery
@@ -51,8 +55,7 @@ public class SearchQuery extends HttpServlet {
 	private static SecretKeySpec secretKey;
     private static byte[] key;
     public static HashMap<String,Integer> wd=new HashMap<String,Integer>();
-    public static Trieuser trieUser;
-       
+      
     /**
      * @see HttpServlet#HttpServlet()
      */
@@ -63,7 +66,7 @@ public class SearchQuery extends HttpServlet {
     public static boolean check_for_word() {
         // System.out.println(word);
         try {
-            BufferedReader in = new BufferedReader(new FileReader("D:\\major\\abc\\words.txt"));
+            BufferedReader in = new BufferedReader(new FileReader("D:\\major\\abc\\unique_stem_words.txt"));
             String str;
             while ((str = in.readLine()) != null) {
                 wd.put(str,1);
@@ -74,6 +77,90 @@ public class SearchQuery extends HttpServlet {
 
         return false;
     }
+/*    public static void unique(){
+    	BufferedWriter out = null;
+    	String line="",token="",a="";
+    	HashMap<String,Integer> h = new HashMap<String,Integer>();
+    	try{
+            FileReader file_to_read2=new FileReader("D:\\major\\abc\\stem_words.txt"); // you can change file path.
+            Scanner filesc2=new Scanner(file_to_read2);//scanner for file
+            FileWriter ofstream2 = new FileWriter("D:\\major\\abc\\unique_stem_words.txt");  // after run, you can see the output file in the specified location
+            out = new BufferedWriter(ofstream2);
+            while(filesc2.hasNextLine())
+            {
+            line=filesc2.nextLine();
+            Scanner linesc=new Scanner(line);//scanner for line
+         
+                while(linesc.hasNext())
+                {
+                 token=linesc.next();
+                 if(!h.containsKey(token)){
+                	 h.put(token, 1);
+                	 out.write(token);
+                	 out.newLine();
+                 }
+                 }
+               
+                linesc.close();
+            }
+        
+
+            } 
+            catch (IOException ioe) {
+         	   ioe.printStackTrace();
+         	}
+         	finally
+         	{ 
+         	   try{
+         	      if(out!=null)
+         		 out.close();
+         	   }catch(Exception ex){
+         	       System.out.println("Error in closing the BufferedWriter"+ex);
+         	    }
+         	}
+    }*/
+   /* public static void stem_dictionary(){
+    	BufferedWriter out = null;
+    	String line="",token="",a="";
+    	Stemmer s1=new Stemmer();
+    	try{
+            FileReader file_to_read2=new FileReader("D:\\major\\abc\\words.txt"); // you can change file path.
+            Scanner filesc2=new Scanner(file_to_read2);//scanner for file
+            FileWriter ofstream2 = new FileWriter("D:\\major\\abc\\stem_words.txt");  // after run, you can see the output file in the specified location
+            out = new BufferedWriter(ofstream2);
+            System.out.println("Stemmed words");
+            while(filesc2.hasNextLine())
+            {
+            line=filesc2.nextLine();
+            Scanner linesc=new Scanner(line);//scanner for line
+         
+                while(linesc.hasNext())
+                {
+                 token=linesc.next();
+                 a=s1.stem(token);//method to access the porter stemmer for english
+                 a.toLowerCase();
+                 out.write(a);
+                 //System.out.println(a);
+                 out.write("\n");
+                }
+                out.newLine();
+                linesc.close();
+            }
+        
+
+            } catch (IOException ioe) {
+    	   ioe.printStackTrace();
+    	}
+    	finally
+    	{ 
+    	   try{
+    	      if(out!=null)
+    		 out.close();
+    	   }catch(Exception ex){
+    	       System.out.println("Error in closing the BufferedWriter"+ex);
+    	    }
+    	}
+    }*/
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -88,7 +175,7 @@ public class SearchQuery extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String key=request.getParameter("keyword");
 		System.out.print("finished reading serialaized bloomfilter");
-		FileInputStream inFile = new FileInputStream("SerializedBloomFilterNew.txt");
+		/*FileInputStream inFile = new FileInputStream("SerializedBloomFilterNew1.txt");
 		BufferedInputStream bin = new BufferedInputStream(inFile);
         int character;
         
@@ -137,18 +224,22 @@ public class SearchQuery extends HttpServlet {
       //  Log.printLine(temptext);
         System.out.print("finished reading serialaized bloomfilter");
         //System.out.print(""+bloomFilter);
-        
-       search(key,bloomFilter);
-       
+       */ 
+		Stemmer s1 = new Stemmer();
+		key=s1.stem(key);
+       search(key);
+		
+		
         
         
         
 	}
 	
-	public void search(String key,BloomFilter<String> bloomFilter)
+	public void search(String key)
 	{
 		 HashMap<String,Integer> hm=new HashMap<String,Integer>();
 		 String input = key;
+		 System.out.println("anand gvaaaaar"+key);
 		 input.toLowerCase();
 		 check_for_word();
 		 Queue q = new LinkedList();
@@ -167,19 +258,39 @@ public class SearchQuery extends HttpServlet {
 					 count=count+1;
 					 q.add("$");
 				 }
-				 if(count>5)
+				 if(count>2)
 					 break;
 			 }
 			 else
 			 {
-				 if (bloomFilter.contains(temp)) { 
-			            System.out.println("\n"+"present");
-			            
-			            
-			        }
+				 if(wd.containsKey(temp))
+				 {
+					 System.out.print("Looking for "+temp+" ");
+					 if (BloomierObject.bloomierFilter.get(temp)!=null) { 
+						 	
+							List<Pair<String,Integer>> myList=new ArrayList<Pair<String, Integer>>();
+							
+							myList=BloomierObject.bloomierFilter.get(temp);
+							for(int i=0;i<myList.size();i++)
+							{
+								
+							 System.out.println(myList.get(i).getL()+" "+myList.get(i).getR()+"\n");
+							}
+							 
+							 
+							 
+							
+							}
+							else
+							{
+								System.out.println("Not present");	
+							}
+					       
+				 }
 				 
 				 
-				 hm.put(temp, count);
+				 
+				 
 				 //delete
 				 for(int i=0;i<temp.length();i++)
 				 {
@@ -191,8 +302,9 @@ public class SearchQuery extends HttpServlet {
 							 temp2 = temp2 + temp.charAt(j);
 						 }
 					 }
-					 if(!hm.containsKey(temp2) && temp2.length() > 0 && wd.containsKey(temp2))
+					 if(!hm.containsKey(temp2) && temp2.length() > 0 )
 					 {
+						 hm.put(temp2, count);
 						 q.add(temp2);
 					 }
 				 }
@@ -208,8 +320,11 @@ public class SearchQuery extends HttpServlet {
 					 for(char j='a';j<='z';j++)
 					 {
 						 String temp2 = left + j + right;
-						 if(!hm.containsKey(temp2)&& temp2.length()>0 && wd.containsKey(temp2))
+						 if(!hm.containsKey(temp2)&& temp2.length()>0)
+						 {
+							 hm.put(temp2, count);
 							 q.add(temp2);
+						 }
 					 }
 				 }
 				 //insert
@@ -220,16 +335,22 @@ public class SearchQuery extends HttpServlet {
 					 for(char j='a';j<='z';j++)
 					 {
 						 String temp2 = lefti + j + right;
-						 if(!hm.containsKey(temp2)&&temp2.length()>0 && wd.containsKey(temp2))
+						 if(!hm.containsKey(temp2)&&temp2.length()>0)
+						 {
+							 hm.put(temp2, count);
 							 q.add(temp2);
+						 }
 					 }
 					 lefti = lefti + temp.charAt(i);
 				 }
 				 for(char j='a';j<='z';j++)
 				 {
 					 String temp2 = lefti + j ;
-					 if(!hm.containsKey(temp2)&&temp2.length()>0 && wd.containsKey(temp2))
+					 if(!hm.containsKey(temp2)&&temp2.length()>0)
+					 {
+						 hm.put(temp2, count);
 						 q.add(temp2);
+					 }
 				 }
 			 }
 		 }

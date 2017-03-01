@@ -1,11 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="src" path="sources"/>
+	<classpathentry kind="src" output="classes" path="sources">
+		<attributes>
+			<attribute name="optional" value="true"/>
+			<attribute name="maven.pomderived" value="true"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="src" path="jars"/>
 	<classpathentry kind="src" path="examples"/>
 	<classpathentry kind="src" path="docs"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7">
+		<attributes>
+			<attribute name="maven.pomderived" value="true"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="lib" path="jars/cloudsim-3.0.3-sources.jar"/>
 	<classpathentry kind="lib" path="jars/cloudsim-examples-3.0.3-sources.jar"/>
 	<classpathentry kind="lib" path="jars/cloudsim-3.0.3.jar"/>
@@ -19,7 +28,16 @@
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.web.container"/>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
 	<classpathentry exported="true" kind="lib" path="D:/xampp/tomcat/lib/servlet-api.jar"/>
-	<classpathentry kind="lib" path="C:/Users/surbhiAnand/Downloads/mysql-connector-java-5.1.40/mysql-connector-java-5.1.40-bin.jar"/>
-	<classpathentry kind="lib" path="C:/Users/surbhiAnand/Downloads/commons-fileupload-1.3.jar"/>
-	<classpathentry kind="output" path="bin"/>
+	<classpathentry exported="true" kind="lib" path="C:/Users/surbhiAnand/Downloads/mysql-connector-java-5.1.40/mysql-connector-java-5.1.40-bin.jar"/>
+	<classpathentry exported="true" kind="lib" path="C:/Users/surbhiAnand/Downloads/commons-fileupload-1.3.jar"/>
+	<classpathentry kind="con" path="org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER">
+		<attributes>
+			<attribute name="maven.pomderived" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="C:/Users/surbhiAnand/Downloads/kryo-4.0.0-all/kryo-4.0.0/lib/minlog-1.3.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/surbhiAnand/Downloads/kryo-4.0.0-all/kryo-4.0.0/lib/objenesis-2.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/surbhiAnand/Downloads/kryo-4.0.0-all/kryo-4.0.0/lib/reflectasm-1.10.1-shaded.jar"/>
+	<classpathentry kind="lib" path="C:/Users/surbhiAnand/Downloads/kryo-4.0.0-all/kryo-4.0.0/kryo-4.0.0.jar"/>
+	<classpathentry kind="output" path="classes"/>
 </classpath>

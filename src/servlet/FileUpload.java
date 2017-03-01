@@ -12,10 +12,13 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
+import java.util.concurrent.TimeoutException;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
@@ -27,6 +30,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
+import com.esotericsoftware.kryo.io.Input;
 
 
 import org.cloudbus.cloudsim.Log;
@@ -35,15 +39,19 @@ import org.cloudbus.cloudsim.core.CloudSim;
 import org.cloudbus.cloudsim.examples.CloudFile;
 import org.cloudbus.cloudsim.examples.CloudHarddriveStorage;
 
+import classes.BloomierObject;
+import classes.Pair;
 import classes.Stopwords;
-import classes.Trieuser;
+import classes.MutableBloomierFilter;
 
 /**
  * Servlet implementation class FileUpload
  */
+
 @WebServlet("/FileUpload")
 @MultipartConfig()
 public class FileUpload extends HttpServlet {
+	
 	private static final long serialVersionUID = 1L;
 	private static SecretKeySpec secretKey;
     private static byte[] key;
@@ -96,7 +104,124 @@ public class FileUpload extends HttpServlet {
 		Log.printLine("Capacity="+hdstCap+" Available="+hdstAvailSpace);
 		
 		
-		String text = "";
+		
+		Log.printLine("Reading files in folder");
+		File folder = new File("D:\\major\\majordataset");
+		File[] listOfFiles = folder.listFiles();
+		
+		List<CloudFile> listOfCloudFiles =new ArrayList();
+		
+		
+		try {
+				BloomierObject.bloomierFilter = new MutableBloomierFilter<String, List<Pair<String,Integer>>>(BloomierObject.originalMap, BloomierObject.originalMap.keySet().size() * 10, 10, 32,
+				        10000);
+			} catch (TimeoutException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} 
+	        
+		 
+		 
+		    for (int i = 0; i < listOfFiles.length; i++) {
+		      if (listOfFiles[i].isFile()) {
+		    	  String text = "";
+		  		  String path=null;
+		  		
+		    	  Log.printLine("File " + listOfFiles[i].getPath());
+		    	  path=listOfFiles[i].getPath();
+		    	  
+		    	  FileInputStream inFile = new FileInputStream(path);
+				  BufferedInputStream bin = new BufferedInputStream(inFile);
+			      int character;
+			        
+			        while((character=bin.read())!=-1) {
+			            text = text + (char)character;
+			        }
+			        bin.close();
+			        inFile.close();
+						
+					 String cipherKey = "pro"; // 128 bit key
+				        			      
+				          String ciphertext= createCipherText(path,cipherKey);
+				          //System.out.print("encrypted text is "+ciphertext);
+				          HashMap<String,Integer> hm;
+				          hm=buildMap(path,cipherKey);
+				         
+				          File log = new File("ListOfFilesNew1.txt");
+				        
+				        		    try{
+				        		    if(log.exists()==false){
+				        		            System.out.println("We had to make a new file at "+log.getAbsolutePath());
+				        		            log.createNewFile();
+				        		    }
+				        		    System.out.println("exists at "+log.getAbsolutePath());
+				        		    PrintWriter out = new PrintWriter(new FileWriter(log, true));
+				        		    out.append(path + "\n");
+				        		    out.close();
+				        		    }catch(IOException e){
+				        		        System.out.println("COULD NOT LOG!!");
+				        		    }
+				          
+				        		    Log.printLine("reading out the list of files");
+				        		    
+				        		    inFile = new FileInputStream("ListOfFilesNew1.txt");
+				        			bin = new BufferedInputStream(inFile);
+				        	        int ch;
+				        	        String temptext="";
+				        	        while((ch=bin.read())!=-1) {
+				        	            temptext = temptext + (char)ch;
+				        	        }
+				        	        bin.close();
+				        	        inFile.close();
+				        	        Log.printLine(temptext);
+				        	        Log.printLine("finished");
+				        	        Stopwords s=new Stopwords();
+				        	        
+				        	      
+				        	        try {
+										s.RemoveStopWords(path);
+									} catch (Exception e1) {
+										// TODO Auto-generated catch block
+										e1.printStackTrace();
+									}
+				        		    
+				        //  CloudFile file2 = null;
+						try {
+							CloudFile cf= new CloudFile(path,5);
+							listOfCloudFiles.add(cf);
+						
+						} catch (ParameterException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						listOfCloudFiles.get(i).addCipherData(ciphertext, cipherKey,hm);
+							//Log.printLine(file2.getName());
+							
+				
+		       // System.out.println("File " + listOfFiles[i].getName());
+		      } else if (listOfFiles[i].isDirectory()) {
+		        System.out.println("Directory " + listOfFiles[i].getName());
+		      }
+		    }
+			CloudSim.startSimulation();
+			 for (int i = 0; i < listOfCloudFiles.size(); i++) {
+			double timetaken = hdst.addCloudFile(listOfCloudFiles.get(i));
+			hdstCap =hdst.getCapacity();
+			hdstAvailSpace =hdst.getAvailableSpace();
+			Log.printLine("Capacity="+hdstCap+" Available="+hdstAvailSpace);
+			/*CloudFile fd1 =hdst.getCloudFile(path);
+			ciphertext=fd1.getCipherData("cText");
+			cipherKey=fd1.getCipherData("cKey");
+			String dectext=decrypt(ciphertext,cipherKey);
+					
+			Log.printLine("decrypted text "+ dectext);*/
+			String site = "Search.jsp" ;
+        	 response.setStatus(response.SC_MOVED_TEMPORARILY);
+        	 response.setHeader("Location", site); 
+			 }
+		    
+		    
+		/*String text = "";
 		String path=null;
 		for(Part part : request.getParts()){
 	         path=getFileName(part);
@@ -123,12 +248,14 @@ public class FileUpload extends HttpServlet {
 	          hm=buildMap(path,cipherKey);
 	          Log.printLine("enctext "+ciphertext);
 	          Log.printLine("file path "+ path);
-	          File log = new File("ListOfFilesNew.txt");
+	          File log = new File("ListOfFilesNew1.txt");
+	        
 	        		    try{
 	        		    if(log.exists()==false){
-	        		            System.out.println("We had to make a new file.");
+	        		            System.out.println("We had to make a new file at "+log.getAbsolutePath());
 	        		            log.createNewFile();
 	        		    }
+	        		    System.out.println("exists at "+log.getAbsolutePath());
 	        		    PrintWriter out = new PrintWriter(new FileWriter(log, true));
 	        		    out.append(path + "\n");
 	        		    out.close();
@@ -138,7 +265,7 @@ public class FileUpload extends HttpServlet {
 	          
 	        		    Log.printLine("reading out the list of files");
 	        		    
-	        		    FileInputStream inFile = new FileInputStream("ListOfFilesNew.txt");
+	        		    FileInputStream inFile = new FileInputStream("ListOfFilesNew1.txt");
 	        			BufferedInputStream bin = new BufferedInputStream(inFile);
 	        	        int character;
 	        	        String temptext="";
@@ -183,7 +310,7 @@ public class FileUpload extends HttpServlet {
 				String site = "UploadFile.jsp" ;
 	        	 response.setStatus(response.SC_MOVED_TEMPORARILY);
 	        	 response.setHeader("Location", site); 
-						
+						*/
 						
 
 	}
