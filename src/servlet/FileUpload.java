@@ -102,25 +102,28 @@ public class FileUpload extends HttpServlet {
 		double hdstCap = hdst.getCapacity();
 		double hdstAvailSpace = hdst.getAvailableSpace();
 		Log.printLine("Capacity="+hdstCap+" Available="+hdstAvailSpace);
-		
-		
-		
+		/*
+		BloomierObject.originalMap= new HashMap<String, List<Pair<String,Integer>>>();
+		List<Pair<String,Integer>> l2 = new ArrayList<Pair<String,Integer>>();
+    	Pair<String,Integer> p3=new Pair<String,Integer>("hey3",3);
+    	Pair<String,Integer> p4=new Pair<String,Integer>("hey4",4);
+    	l2.add(p3);
+    	l2.add(p4);
+        BloomierObject.originalMap.put("key2", l2);
+
+    try {
+    	BloomierObject.bloomierFilter = new MutableBloomierFilter<String, List<Pair<String,Integer>>>(BloomierObject.originalMap, BloomierObject.originalMap.keySet().size() * 3000000, 100, 320,10000);
+	} catch (TimeoutException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+    
+    */
 		Log.printLine("Reading files in folder");
 		File folder = new File("D:\\major\\majordataset");
 		File[] listOfFiles = folder.listFiles();
 		
 		List<CloudFile> listOfCloudFiles =new ArrayList();
-		
-		
-		try {
-				BloomierObject.bloomierFilter = new MutableBloomierFilter<String, List<Pair<String,Integer>>>(BloomierObject.originalMap, BloomierObject.originalMap.keySet().size() * 10, 10, 32,
-				        10000);
-			} catch (TimeoutException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} 
-	        
-		 
 		 
 		    for (int i = 0; i < listOfFiles.length; i++) {
 		      if (listOfFiles[i].isFile()) {
@@ -176,7 +179,7 @@ public class FileUpload extends HttpServlet {
 				        	        Log.printLine(temptext);
 				        	        Log.printLine("finished");
 				        	        Stopwords s=new Stopwords();
-				        	        
+				        	      
 				        	      
 				        	        try {
 										s.RemoveStopWords(path);

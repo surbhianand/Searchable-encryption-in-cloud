@@ -210,9 +210,11 @@ public class ImmutableBloomierFilter<K, V> {
 
 	private byte[] encode(V value) {
 		ByteArrayOutputStream baos 	= new ByteArrayOutputStream();
+		
 		try(Output output = new Output(baos)) {
 			kryo.writeObject(output, value);
 			output.close();
+			output.flush();
 			byte[] serializedValue = baos.toByteArray();
 			if (serializedValue.length > tableEntrySize) {
 				throw new IllegalArgumentException(
@@ -228,9 +230,11 @@ public class ImmutableBloomierFilter<K, V> {
 
     private V decode(byte[] value) {
         ByteBuffer buffer = ByteBuffer.wrap(value);
+   
     	Input input = new ByteBufferInput(buffer);
+    	kryo.register(valueClass);
         V result = kryo.readObject(input, valueClass);
-
+       // input.close();
         // Check leftovers (all must be zero of this is a detected false positive)
         while (buffer.hasRemaining()) {
             if (buffer.get() != 0) {

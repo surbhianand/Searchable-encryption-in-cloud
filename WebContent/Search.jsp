@@ -23,6 +23,32 @@
         <link rel="apple-touch-icon-precomposed" sizes="72x72" href="assets/ico/apple-touch-icon-72-precomposed.png">
         <link rel="apple-touch-icon-precomposed" href="assets/ico/apple-touch-icon-57-precomposed.png">
 <title>Search File</title>
+
+
+<script src="http://code.jquery.com/jquery-latest.min.js"></script>
+        <script>
+            $(document).on("click", "#search2", function() {
+            	window.alert("clicked"+document.getElementById("searchform-keyword").value+" "+document.getElementById("searchform-precision").value);
+            	// When HTML DOM "click" event is invoked on element with ID "somebutton", execute the following function...
+            	$.ajax({
+            		  url: "Search2Query",
+            		  type: "get", //send it through get method
+            		  data: { 
+            		    keyword:document.getElementById("searchform-keyword").value,
+            		    precision:document.getElementById("searchform-precision").value
+            		  },
+            		  success: function(response) {
+            			 
+            		        $.each(responseJson, function(index, item) { 
+            		           window.alert(item+ " "+index);    
+            		        });
+            		  },
+            		  error: function(xhr) {
+            		    //Do Something to handle error
+            		  }
+            		});
+            });
+        </script>
 </head>
 <body>
 <div class="row">
@@ -33,16 +59,21 @@
                     </div>
                     
                      <div class="form-bottom">
-				                    <form role="form" action="SearchQuery" method="post" class="search-form">
+				                    <form role="form" method="post" class="search-form">
 				                    	<div class="form-group">
 				                    		<label class="sr-only" for="form-search">Enter Keyword here</label>
-				                        	<input type="text" name="keyword" placeholder="Keyword..." class="form-search form-control" id="searchform-keyword">
+				                        	<input type="text" name="keyword"  placeholder="Keyword..." class="form-search form-control" id="searchform-keyword">
+				                        	<label class="sr-only" for="form-search">Enter precision here</label>
+				                        	<input type="text" name="precision"  placeholder="Precision..." class="form-search form-control" id="searchform-precision">
 				                        </div>
 				                     
-				                        <button type="submit" class="btn" id="search">Plain text Search</button>
-     
+                                         <button type="submit" class="btn" id="search2" name="Technique2" Width="10px">Trie Based Approach</button>
+                                         
 				                    </form>
 				                    
 			                   </div>
+			                   
+			                   
+			                 
 </body>
 </html>

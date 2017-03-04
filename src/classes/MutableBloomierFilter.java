@@ -50,6 +50,7 @@ public class MutableBloomierFilter<K, V> {
 
             int iota = tau.get(i);
             tauMap.put(key, iota);
+            System.out.println("iota "+iota);
 
             int hashIndex = hasher.getNeighborhood(key)[iota];
             valueTable[hashIndex] = value;

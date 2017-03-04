@@ -93,35 +93,62 @@ class Trie
 	    		System.out.println("Before adding "+temp2+" "+file+" "+child.count);
 	    		
 	    		Pair<String,Integer> p= new Pair<String, Integer>(file,child.count);
-	    		if(BloomierObject.bloomierFilter!=null){
-	    		 List<Pair<String,Integer>> x=BloomierObject.bloomierFilter.get(temp2);
-	    		if(x!=null){
-	    			x.add(p);
+	    		
+	    		 
+	    		/*if(BloomierObject.bloomierFilter.get(temp2) != null){
 	    			
-	    			BloomierObject.bloomierFilter.set(temp2,x);	
+	    			List<Pair<String,Integer>> myListHere=new ArrayList<Pair<String, Integer>>();
+	    			myListHere=BloomierObject.bloomierFilter.get(temp2);
+	    			
+	    			for(int j=0;j<myListHere.size();j++)
+	    			{
+	    				System.out.println("until now "+myListHere.get(j).getL()+" "+myListHere.get(j).getR());
+	    			}
+	    		myListHere.add(p);
+	    		
+	    		BloomierObject.bloomierFilter.set(temp2, myListHere);
+	    			
 	    		}
 	    		else{
-	    			List<Pair<String,Integer>> l= new ArrayList<Pair<String,Integer>>();
-	    			l.add(p);
-	    			BloomierObject.originalMap.put(temp2,l);
-	    			try {
-						BloomierObject.bloomierFilter = new MutableBloomierFilter<String, List<Pair<String,Integer>>>(BloomierObject.originalMap, BloomierObject.originalMap.keySet().size() * 10, 10, 32,
-						        10000);
-					} catch (TimeoutException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} 
-	    		}
-	    		}else
-	    		{
-	    			System.out.println("No bloomier");
+	    			
+	    		List<Pair<String,Integer>> myList=new ArrayList<Pair<String,Integer>>();
+	    		myList.add(p);
+	    		BloomierObject.originalMap.put(temp2,myList);
+	    		//BloomObject.hm.put(temp2,myList);
+	    		try {
+					BloomierObject.bloomierFilter = new MutableBloomierFilter<String, List<Pair<String,Integer>>>(BloomierObject.originalMap, BloomierObject.originalMap.keySet().size() * 10, 10, 32,
+					        10000);
+				} catch (TimeoutException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+	    		}*/
+	    		
+	    		
+	    		
+                 if(BloomObject.bloomFilter.contains(temp2))
+                    {
+	    			
+	    			List<Pair<String,Integer>> myListHere=new ArrayList<Pair<String, Integer>>();
+	    			myListHere=BloomObject.hm.get(temp2);
+	    			
+	    			for(int j=0;j<myListHere.size();j++)
+	    			{
+	    				System.out.println("until now "+myListHere.get(j).getL()+" "+myListHere.get(j).getR());
+	    			}
+	    		myListHere.add(p);
+	    		
+	    		BloomObject.hm.put(temp2, myListHere);
 	    			
 	    		}
-	    		/*int plen = plist.size();
-	    		for(i=0;i<plen;i++)
-	    		{
-	    			System.out.println(plist.get(i).getL()+" "+plist.get(i).getR());
-	    		}*/
+	    		else{
+	    			
+	    		List<Pair<String,Integer>> myList=new ArrayList<Pair<String,Integer>>();
+	    		myList.add(p);	    		
+	    		BloomObject.hm.put(temp2,myList);
+	    		
+	    		}
+	    		
 	    	}
 	    	traverse(child,temp2,file);
 	    }

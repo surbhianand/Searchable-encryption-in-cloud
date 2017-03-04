@@ -13,6 +13,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import classes.User;
+
 /**
  * Servlet implementation class LoginUser
  */
@@ -76,6 +78,7 @@ public class LoginUser extends HttpServlet {
 		         String psw = rs.getString("Password");
 		         if(email.equals(EnteredEmail)&&psw.equals(EnteredPassword))
 		         {
+		        	 User.isLoggedIn=true;
 		        	 String site = "Search.jsp" ;
 		        	 response.setStatus(response.SC_MOVED_TEMPORARILY);
 		        	 response.setHeader("Location", site); 

@@ -40,6 +40,7 @@ import org.cloudbus.cloudsim.core.CloudSim;
 import org.cloudbus.cloudsim.examples.CloudFile;
 import org.cloudbus.cloudsim.examples.CloudHarddriveStorage;
 
+import classes.BloomObject;
 //import classes.BloomierFilter;
 import classes.BloomierObject;
 import classes.Pair;
@@ -174,72 +175,19 @@ public class SearchQuery extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String key=request.getParameter("keyword");
+		String d=request.getParameter("precision");
+		Integer di=Integer.parseInt(d);
 		System.out.print("finished reading serialaized bloomfilter");
-		/*FileInputStream inFile = new FileInputStream("SerializedBloomFilterNew1.txt");
-		BufferedInputStream bin = new BufferedInputStream(inFile);
-        int character;
-        
-        double falsePositiveProbability = 0.1;
-        int expectedSize = 100;
-    	 BloomFilter<String> bloomFilter = new BloomFilter<String>(falsePositiveProbability, expectedSize);
-    	
-    	
-        
-        while((character=bin.read())!=-1)
-        {
-        	String tempkeyword="";
-        while((character=bin.read())!='>') {
-            tempkeyword = tempkeyword + (char)character;
-        }
-        System.out.print("The keyword is "+tempkeyword+"\n");
-       
-        while((character=bin.read())!='{') {
-          
-        }
-        String tempfilename="";
-        while((character=bin.read())!=',') {
-        	tempfilename = tempfilename + (char)character;   
-        }
-        
-        System.out.print("The file name is "+tempfilename+"\n");
-        String tempcount="";
-        while((character=bin.read())!='}') {
-        	tempcount = tempcount + (char)character;   
-        }
-        System.out.print("The count is "+tempcount+"\n");
-        while((character=bin.read())!=')') {
-            
-        }
-        List<Pair<String, Integer>> l=new ArrayList<Pair<String,Integer>>();
-        
-        Pair<String, Integer> p=new Pair<String,Integer>(tempfilename,Integer.parseInt(tempcount));
-        l.add(p);
-        
-        
-        bloomFilter.add(tempkeyword,l);
-        
-        }
-        bin.close();
-        inFile.close();
-      //  Log.printLine(temptext);
-        System.out.print("finished reading serialaized bloomfilter");
-        //System.out.print(""+bloomFilter);
-       */ 
 		Stemmer s1 = new Stemmer();
 		key=s1.stem(key);
-       search(key);
-		
-		
-        
-        
-        
+       search(key,di);   
 	}
 	
-	public void search(String key)
+	public void search(String key,Integer di)
 	{
 		 HashMap<String,Integer> hm=new HashMap<String,Integer>();
 		 String input = key;
-		 System.out.println("anand gvaaaaar"+key);
+		 
 		 input.toLowerCase();
 		 check_for_word();
 		 Queue q = new LinkedList();
@@ -258,7 +206,7 @@ public class SearchQuery extends HttpServlet {
 					 count=count+1;
 					 q.add("$");
 				 }
-				 if(count>2)
+				 if(count>di)
 					 break;
 			 }
 			 else
@@ -266,25 +214,39 @@ public class SearchQuery extends HttpServlet {
 				 if(wd.containsKey(temp))
 				 {
 					 System.out.print("Looking for "+temp+" ");
-					 if (BloomierObject.bloomierFilter.get(temp)!=null) { 
+			/*		 if (BloomierObject.bloomierFilter.get(temp)!=null) { 
 						 	
 							List<Pair<String,Integer>> myList=new ArrayList<Pair<String, Integer>>();
 							
 							myList=BloomierObject.bloomierFilter.get(temp);
 							for(int i=0;i<myList.size();i++)
 							{
-								
+					
 							 System.out.println(myList.get(i).getL()+" "+myList.get(i).getR()+"\n");
 							}
-							 
-							 
-							 
+							}
+							else
+							{
+								System.out.println("Not present");	
+							}*/
+					 
+					 
+					 if (BloomObject.hm.get(temp)!=null) { 
+						 	
+							List<Pair<String,Integer>> myList=new ArrayList<Pair<String, Integer>>();
 							
+							myList=BloomObject.hm.get(temp);
+							for(int i=0;i<myList.size();i++)
+							{
+					
+							 System.out.println(myList.get(i).getL()+" "+myList.get(i).getR()+"\n");
+							}
 							}
 							else
 							{
 								System.out.println("Not present");	
 							}
+					 
 					       
 				 }
 				 

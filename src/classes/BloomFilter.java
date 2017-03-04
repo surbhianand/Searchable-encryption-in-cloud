@@ -31,7 +31,6 @@ public class BloomFilter<E> implements Serializable {
     private int expectedNumberOfFilterElements; // expected (maximum) number of elements to be added
     private int numberOfAddedElements; // number of elements actually added to the Bloom filter
     private int k; // number of hash functions
-    private List<Pair<String,Integer>> linkFiles;
 
     static final Charset charset = Charset.forName("UTF-8"); // encoding used for storing hash values as strings
 
@@ -62,7 +61,6 @@ public class BloomFilter<E> implements Serializable {
       this.bitSetSize = (int)Math.ceil(c * n);
       numberOfAddedElements = 0;
       this.bitset = new BitSet(bitSetSize);
-      this.linkFiles = null;
     }
 
     /**
@@ -283,8 +281,8 @@ public class BloomFilter<E> implements Serializable {
      *
      * @param element is an element to register in the Bloom filter.
      */
-    public void add(E element,List<Pair<String,Integer>> list) {
-       add(element.toString().getBytes(charset),list);
+    public void add(E element) {
+       add(element.toString().getBytes(charset));
     }
 
     /**
@@ -292,22 +290,21 @@ public class BloomFilter<E> implements Serializable {
      *
      * @param bytes array of bytes to add to the Bloom filter.
      */
-    public void add(byte[] bytes,List<Pair<String,Integer>> list) {
+    public void add(byte[] bytes) {
        int[] hashes = createHashes(bytes, k);
        for (int hash : hashes)
            bitset.set(Math.abs(hash % bitSetSize), true);
        numberOfAddedElements ++;
-       linkFiles = list;
     }
 
     /**
      * Adds all elements from a Collection to the Bloom filter.
      * @param c Collection of elements.
      */
-    /*public void addAll(Collection<? extends E> c) {
+    public void addAll(Collection<? extends E> c) {
         for (E element : c)
             add(element);
-    }*/
+    }
         
     /**
      * Returns true if the element could have been inserted into the Bloom filter.
@@ -337,29 +334,6 @@ public class BloomFilter<E> implements Serializable {
             }
         }
         return true;
-    }
-    
-    
-    public List<Pair<String,Integer>> getList(E element) {
-        return getLists(element.toString().getBytes(charset));
-    }
-
-    /**
-     * Returns true if the array of bytes could have been inserted into the Bloom filter.
-     * Use getFalsePositiveProbability() to calculate the probability of this
-     * being correct.
-     *
-     * @param bytes array of bytes to check.
-     * @return true if the array could have been inserted into the Bloom filter.
-     */
-    public List<Pair<String,Integer>> getLists(byte[] bytes) {
-        int[] hashes = createHashes(bytes, k);
-        for (int hash : hashes) {
-            if (!bitset.get(Math.abs(hash % bitSetSize))) {
-                
-            }
-        }
-        return linkFiles;
     }
 
     /**
@@ -451,34 +425,4 @@ public class BloomFilter<E> implements Serializable {
     public double getBitsPerElement() {
         return this.bitSetSize / (double)numberOfAddedElements;
     }
-    
-    /*public static void main(String args[]){
-        double falsePositiveProbability = 0.1;
-        int expectedSize = 100;
-
-        BloomFilter<String> bloomFilter = new BloomFilter<String>(falsePositiveProbability, expectedSize);
-        List<Pair<String,Integer>> xl = new ArrayList<Pair<String, Integer>>();
-        Pair<String,Integer> p = new Pair<String,Integer>("abc",1);
-        xl.add(p);
-        p = new Pair<String,Integer>("ab",2);
-        xl.add(p);
-        bloomFilter.add("foo",xl);
-        xl = new ArrayList<Pair<String, Integer>>();
-        p = new Pair<String,Integer>("xyz",1);
-        xl.add(p);
-        p = new Pair<String,Integer>("ty",2);
-        xl.add(p);
-        bloomFilter.add("hello",xl);
-
-        if (bloomFilter.contains("hello")) { // Always returns true
-        	xl = bloomFilter.getList("hello");
-        	System.out.println(""+xl.get(0).getL());
-            System.out.println("BloomFilter contains foo!"); 
-            System.out.println("Probability of a false positive: " + bloomFilter.expectedFalsePositiveProbability());
-        }
-
-        if (bloomFilter.contains("bar")) { // Should return false, but could return true
-            System.out.println("There was a false positive.");
-        }
-    }*/
 }
