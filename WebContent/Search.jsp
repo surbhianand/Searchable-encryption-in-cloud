@@ -23,12 +23,18 @@
         <link rel="apple-touch-icon-precomposed" sizes="72x72" href="assets/ico/apple-touch-icon-72-precomposed.png">
         <link rel="apple-touch-icon-precomposed" href="assets/ico/apple-touch-icon-57-precomposed.png">
 <title>Search File</title>
-
+<style type="text/css">
+ #topcorner{
+   position:absolute;
+   top:0;
+   right:0;
+  }
+</style>
 
 <script src="http://code.jquery.com/jquery-latest.min.js"></script>
         <script>
             $(document).on("click", "#search2", function() {
-            	window.alert("clicked"+document.getElementById("searchform-keyword").value+" "+document.getElementById("searchform-precision").value);
+            	//window.alert("clicked"+document.getElementById("searchform-keyword").value+" "+document.getElementById("searchform-precision").value);
             	// When HTML DOM "click" event is invoked on element with ID "somebutton", execute the following function...
             	$.ajax({
             		  url: "Search2Query",
@@ -38,7 +44,31 @@
             		    precision:document.getElementById("searchform-precision").value
             		  },
             		  success: function(response) {
-            			 
+            			  window.alert("came back here");
+            		        $.each(responseJson, function(index, item) { 
+            		           window.alert(item+ " "+index);    
+            		        });
+            		  },
+            		  error: function(xhr) {
+            			  window.alert("error");
+            		    //Do Something to handle error
+            		  }
+            		});
+            });
+            
+            
+            $(document).on("click", "#search1", function() {
+            	window.alert("clicked"+document.getElementById("searchform-keyword").value+" "+document.getElementById("searchform-precision").value);
+            	// When HTML DOM "click" event is invoked on element with ID "somebutton", execute the following function...
+            	$.ajax({
+            		  url: "SearchQuery",
+            		  type: "get", //send it through get method
+            		  data: { 
+            		    keyword:document.getElementById("searchform-keyword").value,
+            		    precision:document.getElementById("searchform-precision").value
+            		  },
+            		  success: function(response) {
+            			  window.alert("came back here");
             		        $.each(responseJson, function(index, item) { 
             		           window.alert(item+ " "+index);    
             		        });
@@ -51,8 +81,15 @@
         </script>
 </head>
 <body>
+
 <div class="row">
+
+ 
                         <div class="col-sm-8 col-sm-offset-2 text">
+                        <a href="DataOwner.jsp"><button id="topcorner" class="btn" Width="10px">Click to add  more files</button></a>
+                       
+                           <br>
+                           <br>
                             <h1>Enter Keywords</h1>
                            
                         </div>
@@ -68,6 +105,9 @@
 				                        </div>
 				                     
                                          <button type="submit" class="btn" id="search2" name="Technique2" Width="10px">Trie Based Approach</button>
+                                         <br>
+                                         <br>
+                                          <button type="submit" class="btn" id="search1" name="Technique1" Width="10px">WildCard Based Approach</button>
                                          
 				                    </form>
 				                    

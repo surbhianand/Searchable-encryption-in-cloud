@@ -89,8 +89,10 @@ public class Search2Query extends HttpServlet {
 			        	prevrow[i]=i;
 			        TrieUser2.traversefile(TrieUser2.t.root,temp,di,prevrow,key);
 			        
-			        System.out.println("length "+TrieUser2.finalResult.size());
-			        for(int i=0;i<TrieUser2.finalResult.size();i++)
+			        System.out.println("lengthiiiiiiiiiiiiiiii "+TrieUser2.finalResult.size());
+			        HashMap<String,Integer> filevisited = new HashMap<String, Integer>();
+	        	    ArrayList<String> uniquefiles = new ArrayList<String>();
+			        for(int i=0;i<=di;i++)
 			        {
 			        	if(TrieUser2.finalResult.containsKey(i))
 			        	{
@@ -115,40 +117,44 @@ public class Search2Query extends HttpServlet {
 			        	    Collections.reverse(filetodisplay);
 			        	  //print file to display here.............
 			        	    for(int j=0;j<filetodisplay.size();j++)
-			        	    	System.out.println(filetodisplay.get(j));
-			        	    
-			        	    
-			        	    for(int j=0;j<filetodisplay.size();j++)
 			        	    {
-			        	    	FileInputStream inFile = new FileInputStream(filetodisplay.get(j));
-			        			BufferedInputStream bin = new BufferedInputStream(inFile);
-			        	        int ch;
-			        	        String temptext="";
-			        	        while((ch=bin.read())!=-1) {
-			        	            temptext = temptext + (char)ch;
-			        	        }
-			        	        bin.close();
-			        	        inFile.close();
-			        	        dataToBeDisplayed.add(temptext);
-			        	    	
-			        	    	
-			        	    }
-			        	    
-			        	    
-			        	    
-			        	    
+			        	    	if(!filevisited.containsKey(filetodisplay.get(j)))
+			        	    	{
+			        	    		System.out.println("hello");
+			        	    		filevisited.put(filetodisplay.get(j), 1);
+			        	    		uniquefiles.add(filetodisplay.get(j));
+			        	    	}
 			        	}
 			        }
+			        for(int j=0;j<uniquefiles.size();j++)
+	        	    {
+	        	    	System.out.println(uniquefiles.get(j));
+	        	    }
+			        for(int j=0;j<uniquefiles.size();j++)
+	        	    {
+	        	    	FileInputStream inFile = new FileInputStream(uniquefiles.get(j));
+	        			BufferedInputStream bin = new BufferedInputStream(inFile);
+	        	        int ch;
+	        	        String temptext="";
+	        	        while((ch=bin.read())!=-1) {
+	        	            temptext = temptext + (char)ch;
+	        	        }
+	        	        bin.close();
+	        	        inFile.close();
+	        	        dataToBeDisplayed.add(temptext);
+	        	    	
+	        	    	
+	        	    }
 			        Gson gson=new Gson();
 			       
 			        String json = new Gson().toJson(dataToBeDisplayed);
-			        System.out.println(""+json);
+			        System.out.println("printed "+json);
 
 			        response.setContentType("application/json");
 			        response.setCharacterEncoding("UTF-8");
 			        response.getWriter().write(json);
 	}
-
+	}
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -333,8 +339,10 @@ class TrieUser2
 	    		System.out.println("distance "+nwrow[word.length()]+" "+temp2);
 	    		
 	    		 if (BloomObject.hm.get(temp2)!=null) { 
-					 	
-						List<Pair<String,Integer>> myList=new ArrayList<Pair<String, Integer>>();
+					
+	    			 System.out.println("surbhi bewakoof"+finalResult.size());
+	    			 
+	    			 	List<Pair<String,Integer>> myList=new ArrayList<Pair<String, Integer>>();
 						
 						myList=BloomObject.hm.get(temp2);
 						if(!finalResult.containsKey(nwrow[word.length()]))

@@ -18,7 +18,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -39,6 +41,8 @@ import org.cloudbus.cloudsim.ParameterException;
 import org.cloudbus.cloudsim.core.CloudSim;
 import org.cloudbus.cloudsim.examples.CloudFile;
 import org.cloudbus.cloudsim.examples.CloudHarddriveStorage;
+
+import com.google.gson.Gson;
 
 import classes.BloomObject;
 //import classes.BloomierFilter;
@@ -167,24 +171,90 @@ public class SearchQuery extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		response.getWriter().append("Served at: ").append(request.getContextPath());
+		//response.getWriter().append("Served at: ").append(request.getContextPath());
+		
+		 List<String> dataToBeDisplayed=new ArrayList<String>();
+		System.out.println("came here in wildcard search");
+		String key=request.getParameter("keyword");
+		String d=request.getParameter("precision");
+		Integer di=Integer.parseInt(d);
+		Stemmer s1 = new Stemmer();
+		key=s1.stem(key);
+		HashMap<Integer,List<List<Pair<String,Integer>>>> fr=new HashMap<Integer, List<List<Pair<String, Integer>>>>();
+				fr=search(key,di); 
+				
+				System.out.print("came back");		
+				   for(int i=0;i<=di;i++)
+			        {
+			        	if(fr.containsKey(i))
+			        	{
+			        		List< List<Pair<String, Integer>>> wordlist = fr.get(i);
+			        		HashMap<Float,String> ranked = new HashMap<Float,String>();
+			        		for(int j=0;j<wordlist.size();j++)
+			        		{
+			        			List<Pair<String,Integer>> indword = wordlist.get(j);
+			        			for(int k=0;k<indword.size();k++)
+			        			{
+			        				Pair<String,Integer> p = indword.get(k);
+			        				ranked.put(score(p.getR(),indword.size()), p.getL());
+			        			}
+			        		}
+			        		ArrayList<String> filetodisplay = new ArrayList<String>();
+			        		Iterator it = ranked.entrySet().iterator();
+			        	    while (it.hasNext()) {
+			        	        HashMap.Entry pair = (HashMap.Entry)it.next();
+			        	        filetodisplay.add((String) pair.getValue());
+			        	        it.remove(); // avoids a ConcurrentModificationException
+			        	    }
+			        	    Collections.reverse(filetodisplay);
+			        	  //print file to display here.............
+			        	    System.out.println("files to be displayed list "+filetodisplay.size());
+			        	    for(int j=0;j<filetodisplay.size();j++)
+			        	    	System.out.println(filetodisplay.get(j));
+			        	    
+			        	    
+			        	    /*for(int j=0;j<filetodisplay.size();j++)
+			        	    {
+			        	    	FileInputStream inFile = new FileInputStream(filetodisplay.get(j));
+			        			BufferedInputStream bin = new BufferedInputStream(inFile);
+			        	        int ch;
+			        	        String temptext="";
+			        	        while((ch=bin.read())!=-1) {
+			        	        	//System.out.println(temptext);
+			        	            temptext = temptext + (char)ch;
+			        	        }
+			        	        bin.close();
+			        	        inFile.close();
+			        	        dataToBeDisplayed.add(temptext);
+			        	    	
+			        	    	
+			        	    }*/
+			        	    
+			        	    
+			        	    
+			        	    
+			        	}
+			        }
+			        Gson gson=new Gson();
+			       
+			        String json = new Gson().toJson(dataToBeDisplayed);
+			        System.out.println("printed "+json);
+
+			        response.setContentType("application/json");
+			        response.setCharacterEncoding("UTF-8");
+			        response.getWriter().write(json);
 	}
 
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String key=request.getParameter("keyword");
-		String d=request.getParameter("precision");
-		Integer di=Integer.parseInt(d);
-		System.out.print("finished reading serialaized bloomfilter");
-		Stemmer s1 = new Stemmer();
-		key=s1.stem(key);
-       search(key,di);   
+	
 	}
 	
-	public void search(String key,Integer di)
+	public HashMap<Integer,List<List<Pair<String,Integer>>>> search(String key,Integer di)
 	{
+		HashMap<Integer,List<List<Pair<String,Integer>>>> finalResult= new HashMap<Integer, List<List<Pair<String, Integer>>>>();
 		 HashMap<String,Integer> hm=new HashMap<String,Integer>();
 		 String input = key;
 		 
@@ -194,11 +264,16 @@ public class SearchQuery extends HttpServlet {
 		 q.add(input);
 		 q.add("$");
 		 int count=0;
+		 int num=0;
 		 while(!q.isEmpty())
 		 {
 			 Object obj = new Object();
 			 obj  = q.remove();
 			 String temp = obj.toString();
+			 if(num>100000)
+			 {
+				 break;
+			 }
 			 if(temp.equals("$"))
 			 {
 				 if(q.size()!=0)
@@ -213,7 +288,7 @@ public class SearchQuery extends HttpServlet {
 			 {
 				 if(wd.containsKey(temp))
 				 {
-					 System.out.print("Looking for "+temp+" ");
+					 System.out.print("Looking for "+temp+" "+num);
 			/*		 if (BloomierObject.bloomierFilter.get(temp)!=null) { 
 						 	
 							List<Pair<String,Integer>> myList=new ArrayList<Pair<String, Integer>>();
@@ -232,10 +307,29 @@ public class SearchQuery extends HttpServlet {
 					 
 					 
 					 if (BloomObject.hm.get(temp)!=null) { 
-						 	
+						 	System.out.println("checked in bloom filter");
 							List<Pair<String,Integer>> myList=new ArrayList<Pair<String, Integer>>();
 							
 							myList=BloomObject.hm.get(temp);
+							System.out.println("list retreived from bloom filter");
+							
+							if(!finalResult.containsKey(count))
+							{
+								System.out.println("hash map already contains");
+								List< List<Pair<String,Integer>>> inter = new ArrayList<List<Pair<String, Integer>>>();
+								inter.add(myList);
+								finalResult.put(count,inter);
+							}
+							else
+							{
+								System.out.println("hash map did'nt contain newly created");
+								List< List<Pair<String,Integer>>> inter = finalResult.get(count);
+								finalResult.remove(count);
+								inter.add(myList);
+								finalResult.put(count,inter);
+							}
+							
+							
 							for(int i=0;i<myList.size();i++)
 							{
 					
@@ -268,6 +362,9 @@ public class SearchQuery extends HttpServlet {
 					 {
 						 hm.put(temp2, count);
 						 q.add(temp2);
+						 num+=1;
+						 if(num>10000)
+							 break;
 					 }
 				 }
 				 //replace
@@ -286,6 +383,9 @@ public class SearchQuery extends HttpServlet {
 						 {
 							 hm.put(temp2, count);
 							 q.add(temp2);
+							 num+=1;
+							 if(num>10000)
+								 break;
 						 }
 					 }
 				 }
@@ -301,6 +401,9 @@ public class SearchQuery extends HttpServlet {
 						 {
 							 hm.put(temp2, count);
 							 q.add(temp2);
+							 num+=1;
+							 if(num>10000)
+								 break;
 						 }
 					 }
 					 lefti = lefti + temp.charAt(i);
@@ -312,15 +415,24 @@ public class SearchQuery extends HttpServlet {
 					 {
 						 hm.put(temp2, count);
 						 q.add(temp2);
+						 num+=1;
+						 if(num>10000)
+							 break;	 
 					 }
 				 }
 			 }
+			 
+			 System.out.println("out of else after checking for "+temp);
 		 }
 		
-		
+	return finalResult;	
 		
 	}
 	
+	Float score(Integer a,Integer b)
+	{
+		return (float) (a+b);
+	}
 	   public static void setKey(String myKey) 
 	    {
 	        MessageDigest sha = null;
