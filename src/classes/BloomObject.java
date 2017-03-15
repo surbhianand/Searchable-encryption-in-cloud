@@ -10,4 +10,5 @@ public class BloomObject {
 	
 public	static BloomFilter<String> bloomFilter = new BloomFilter<String>(falsePositiveProbability, expectedNumberOfElements);
 public static HashMap<String,List<Pair<String,Integer>>> hm=new HashMap<String,List<Pair<String,Integer>>>();
+
 }

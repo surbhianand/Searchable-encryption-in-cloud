@@ -33,50 +33,64 @@
 
 <script src="http://code.jquery.com/jquery-latest.min.js"></script>
         <script>
-            $(document).on("click", "#search2", function() {
-            	//window.alert("clicked"+document.getElementById("searchform-keyword").value+" "+document.getElementById("searchform-precision").value);
-            	// When HTML DOM "click" event is invoked on element with ID "somebutton", execute the following function...
-            	$.ajax({
-            		  url: "Search2Query",
-            		  type: "get", //send it through get method
-            		  data: { 
-            		    keyword:document.getElementById("searchform-keyword").value,
-            		    precision:document.getElementById("searchform-precision").value
-            		  },
-            		  success: function(response) {
-            			  window.alert("came back here");
-            		        $.each(responseJson, function(index, item) { 
-            		           window.alert(item+ " "+index);    
-            		        });
-            		  },
-            		  error: function(xhr) {
-            			  window.alert("error");
-            		    //Do Something to handle error
-            		  }
-            		});
-            });
-            
+        $(document).on("click", "#search2", function() {
+        	
+        	$("#result").html("");
+        	$.ajax({
+        		  url: "Search2Query",
+        		  type: "get", //send it through get method
+        		  dataType: 'json',
+        		  cache:false,
+        		  data: { 
+        		    keyword:document.getElementById("searchform-keyword").value,
+        		    precision:document.getElementById("searchform-precision").value
+        		  },
+        		  success: function(responseJson) {
+        	
+        			 var $ul = $("<ul>").appendTo($("#result"));
+        		        $.each(responseJson, function(index, item) {
+        		        	 $("<li>").text(item).appendTo($ul); 
+        		        }); 
+        		        
+        		        document.getElementById('searchform-keyword').value = "";
+        		        document.getElementById('searchform-precision').value = "";
+        		      
+        		  },
+        		  error: function(xhr) {
+        		    //Do Something to handle error
+        		  }
+        		}); 
+       		
+        });
             
             $(document).on("click", "#search1", function() {
-            	window.alert("clicked"+document.getElementById("searchform-keyword").value+" "+document.getElementById("searchform-precision").value);
-            	// When HTML DOM "click" event is invoked on element with ID "somebutton", execute the following function...
+            	
+            	$("#result").html("");
             	$.ajax({
             		  url: "SearchQuery",
             		  type: "get", //send it through get method
+            		  dataType: 'json',
+            		  cache:false,
             		  data: { 
             		    keyword:document.getElementById("searchform-keyword").value,
             		    precision:document.getElementById("searchform-precision").value
             		  },
-            		  success: function(response) {
-            			  window.alert("came back here");
-            		        $.each(responseJson, function(index, item) { 
-            		           window.alert(item+ " "+index);    
-            		        });
+            		  success: function(responseJson) {
+            	
+            			 var $ul = $("<ul>").appendTo($("#result"));
+            		        $.each(responseJson, function(index, item) {
+            		        	 $("<li>").text(item).appendTo($ul); 
+            		        }); 
+            		        
+            		        document.getElementById('searchform-keyword').value = "";
+            		        document.getElementById('searchform-precision').value = "";
+            		      
             		  },
             		  error: function(xhr) {
             		    //Do Something to handle error
             		  }
-            		});
+            		}); 
+           		
             });
         </script>
 </head>
@@ -104,13 +118,17 @@
 				                        	<input type="text" name="precision"  placeholder="Precision..." class="form-search form-control" id="searchform-precision">
 				                        </div>
 				                     
-                                         <button type="submit" class="btn" id="search2" name="Technique2" Width="10px">Trie Based Approach</button>
+                                         <button type="button" class="btn" id="search2" name="Technique2" Width="10px">Trie Based Approach</button>
                                          <br>
                                          <br>
-                                          <button type="submit" class="btn" id="search1" name="Technique1" Width="10px">WildCard Based Approach</button>
+                                          <button type="button" class="btn" id="search1" name="Technique1" Width="10px">WildCard Based Approach</button>
                                          
 				                    </form>
 				                    
+				                    
+				                    <div id="result">
+				                  
+				                    </div>
 			                   </div>
 			                   
 			                   

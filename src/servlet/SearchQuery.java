@@ -82,93 +82,7 @@ public class SearchQuery extends HttpServlet {
 
         return false;
     }
-/*    public static void unique(){
-    	BufferedWriter out = null;
-    	String line="",token="",a="";
-    	HashMap<String,Integer> h = new HashMap<String,Integer>();
-    	try{
-            FileReader file_to_read2=new FileReader("D:\\major\\abc\\stem_words.txt"); // you can change file path.
-            Scanner filesc2=new Scanner(file_to_read2);//scanner for file
-            FileWriter ofstream2 = new FileWriter("D:\\major\\abc\\unique_stem_words.txt");  // after run, you can see the output file in the specified location
-            out = new BufferedWriter(ofstream2);
-            while(filesc2.hasNextLine())
-            {
-            line=filesc2.nextLine();
-            Scanner linesc=new Scanner(line);//scanner for line
-         
-                while(linesc.hasNext())
-                {
-                 token=linesc.next();
-                 if(!h.containsKey(token)){
-                	 h.put(token, 1);
-                	 out.write(token);
-                	 out.newLine();
-                 }
-                 }
-               
-                linesc.close();
-            }
-        
 
-            } 
-            catch (IOException ioe) {
-         	   ioe.printStackTrace();
-         	}
-         	finally
-         	{ 
-         	   try{
-         	      if(out!=null)
-         		 out.close();
-         	   }catch(Exception ex){
-         	       System.out.println("Error in closing the BufferedWriter"+ex);
-         	    }
-         	}
-    }*/
-   /* public static void stem_dictionary(){
-    	BufferedWriter out = null;
-    	String line="",token="",a="";
-    	Stemmer s1=new Stemmer();
-    	try{
-            FileReader file_to_read2=new FileReader("D:\\major\\abc\\words.txt"); // you can change file path.
-            Scanner filesc2=new Scanner(file_to_read2);//scanner for file
-            FileWriter ofstream2 = new FileWriter("D:\\major\\abc\\stem_words.txt");  // after run, you can see the output file in the specified location
-            out = new BufferedWriter(ofstream2);
-            System.out.println("Stemmed words");
-            while(filesc2.hasNextLine())
-            {
-            line=filesc2.nextLine();
-            Scanner linesc=new Scanner(line);//scanner for line
-         
-                while(linesc.hasNext())
-                {
-                 token=linesc.next();
-                 a=s1.stem(token);//method to access the porter stemmer for english
-                 a.toLowerCase();
-                 out.write(a);
-                 //System.out.println(a);
-                 out.write("\n");
-                }
-                out.newLine();
-                linesc.close();
-            }
-        
-
-            } catch (IOException ioe) {
-    	   ioe.printStackTrace();
-    	}
-    	finally
-    	{ 
-    	   try{
-    	      if(out!=null)
-    		 out.close();
-    	   }catch(Exception ex){
-    	       System.out.println("Error in closing the BufferedWriter"+ex);
-    	    }
-    	}
-    }*/
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		//response.getWriter().append("Served at: ").append(request.getContextPath());
@@ -182,14 +96,14 @@ public class SearchQuery extends HttpServlet {
 		key=s1.stem(key);
 		HashMap<Integer,List<List<Pair<String,Integer>>>> fr=new HashMap<Integer, List<List<Pair<String, Integer>>>>();
 				fr=search(key,di); 
-				
-				System.out.print("came back");		
+				HashMap<Float,String> ranked = new HashMap<Float,String>();
+				 ArrayList<String> uniquefiles = new ArrayList<String>();
 				   for(int i=0;i<=di;i++)
 			        {
 			        	if(fr.containsKey(i))
 			        	{
 			        		List< List<Pair<String, Integer>>> wordlist = fr.get(i);
-			        		HashMap<Float,String> ranked = new HashMap<Float,String>();
+			        		
 			        		for(int j=0;j<wordlist.size();j++)
 			        		{
 			        			List<Pair<String,Integer>> indword = wordlist.get(j);
@@ -199,59 +113,62 @@ public class SearchQuery extends HttpServlet {
 			        				ranked.put(score(p.getR(),indword.size()), p.getL());
 			        			}
 			        		}
-			        		ArrayList<String> filetodisplay = new ArrayList<String>();
-			        		Iterator it = ranked.entrySet().iterator();
-			        	    while (it.hasNext()) {
-			        	        HashMap.Entry pair = (HashMap.Entry)it.next();
-			        	        filetodisplay.add((String) pair.getValue());
-			        	        it.remove(); // avoids a ConcurrentModificationException
-			        	    }
-			        	    Collections.reverse(filetodisplay);
-			        	  //print file to display here.............
-			        	    System.out.println("files to be displayed list "+filetodisplay.size());
-			        	    for(int j=0;j<filetodisplay.size();j++)
-			        	    	System.out.println(filetodisplay.get(j));
-			        	    
-			        	    
-			        	    /*for(int j=0;j<filetodisplay.size();j++)
-			        	    {
-			        	    	FileInputStream inFile = new FileInputStream(filetodisplay.get(j));
-			        			BufferedInputStream bin = new BufferedInputStream(inFile);
-			        	        int ch;
-			        	        String temptext="";
-			        	        while((ch=bin.read())!=-1) {
-			        	        	//System.out.println(temptext);
-			        	            temptext = temptext + (char)ch;
-			        	        }
-			        	        bin.close();
-			        	        inFile.close();
-			        	        dataToBeDisplayed.add(temptext);
-			        	    	
-			        	    	
-			        	    }*/
-			        	    
+			        		
+			        	} 
 			        	    
 			        	    
 			        	    
 			        	}
-			        }
+				   ArrayList<String> filetodisplay = new ArrayList<String>();
+	        		Iterator it = ranked.entrySet().iterator();
+	        	    while (it.hasNext()) {
+	        	        HashMap.Entry pair = (HashMap.Entry)it.next();
+	        	        filetodisplay.add((String) pair.getValue());
+	        	        it.remove(); // avoids a ConcurrentModificationException
+	        	    }
+	        	    Collections.reverse(filetodisplay);
+	        	 
+	        	    HashMap<String,Integer> filevisited = new HashMap<String, Integer>();
+	        	    for(int j=0;j<filetodisplay.size();j++)
+	        	    {
+	        	    	if(!filevisited.containsKey(filetodisplay.get(j)))
+	        	    	{
+	        	   
+	        	    		filevisited.put(filetodisplay.get(j), 1);
+	        	    		uniquefiles.add(filetodisplay.get(j));
+	        	    	}
+	        	   }
+	        	   
+				   
+			        for(int j=0;j<uniquefiles.size();j++)
+	        	    {
+	        	    	FileInputStream inFile = new FileInputStream(uniquefiles.get(j));
+	        	    	System.out.println(uniquefiles.get(j));
+	        			BufferedInputStream bin = new BufferedInputStream(inFile);
+	        	        int ch;
+	        	        String temptext="";
+	        	        while((ch=bin.read())!=-1) {
+	        	            temptext = temptext + (char)ch;
+	        	        }
+	        	        
+	        	        bin.close();
+	        	        inFile.close();
+	        	        dataToBeDisplayed.add(temptext);
+	        	    	
+	        	    	
+	        	    }
 			        Gson gson=new Gson();
-			       
+			       // System.out.println(dataToBeDisplayed);
+			       System.out.println("convertinnnnnnnnnnnng");
+			        //String json=(JSONArray)JSONSerializer.toJSON(objList)
 			        String json = new Gson().toJson(dataToBeDisplayed);
-			        System.out.println("printed "+json);
+			        System.out.println("printed iiiiiiiiiiiiiiiiii"+json);
 
 			        response.setContentType("application/json");
 			        response.setCharacterEncoding("UTF-8");
 			        response.getWriter().write(json);
 	}
 
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-	
-	}
-	
 	public HashMap<Integer,List<List<Pair<String,Integer>>>> search(String key,Integer di)
 	{
 		HashMap<Integer,List<List<Pair<String,Integer>>>> finalResult= new HashMap<Integer, List<List<Pair<String, Integer>>>>();
@@ -288,7 +205,7 @@ public class SearchQuery extends HttpServlet {
 			 {
 				 if(wd.containsKey(temp))
 				 {
-					 System.out.print("Looking for "+temp+" "+num);
+					// System.out.print("Looking for "+temp+" "+num);
 			/*		 if (BloomierObject.bloomierFilter.get(temp)!=null) { 
 						 	
 							List<Pair<String,Integer>> myList=new ArrayList<Pair<String, Integer>>();
@@ -307,40 +224,30 @@ public class SearchQuery extends HttpServlet {
 					 
 					 
 					 if (BloomObject.hm.get(temp)!=null) { 
-						 	System.out.println("checked in bloom filter");
+						 	//System.out.println("checked in bloom filter");
 							List<Pair<String,Integer>> myList=new ArrayList<Pair<String, Integer>>();
 							
 							myList=BloomObject.hm.get(temp);
-							System.out.println("list retreived from bloom filter");
+							//System.out.println("list retreived from bloom filter");
 							
 							if(!finalResult.containsKey(count))
 							{
-								System.out.println("hash map already contains");
+								//System.out.println("hash map already contains");
 								List< List<Pair<String,Integer>>> inter = new ArrayList<List<Pair<String, Integer>>>();
 								inter.add(myList);
 								finalResult.put(count,inter);
 							}
 							else
 							{
-								System.out.println("hash map did'nt contain newly created");
+								//System.out.println("hash map did'nt contain newly created");
 								List< List<Pair<String,Integer>>> inter = finalResult.get(count);
 								finalResult.remove(count);
 								inter.add(myList);
 								finalResult.put(count,inter);
 							}
 							
+							}
 							
-							for(int i=0;i<myList.size();i++)
-							{
-					
-							 System.out.println(myList.get(i).getL()+" "+myList.get(i).getR()+"\n");
-							}
-							}
-							else
-							{
-								System.out.println("Not present");	
-							}
-					 
 					       
 				 }
 				 
@@ -422,7 +329,7 @@ public class SearchQuery extends HttpServlet {
 				 }
 			 }
 			 
-			 System.out.println("out of else after checking for "+temp);
+		
 		 }
 		
 	return finalResult;	
@@ -431,7 +338,7 @@ public class SearchQuery extends HttpServlet {
 	
 	Float score(Integer a,Integer b)
 	{
-		return (float) (a+b);
+		return (float) (1+Math.log(a)*Math.log(1+(1/b)));
 	}
 	   public static void setKey(String myKey) 
 	    {

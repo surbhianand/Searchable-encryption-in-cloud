@@ -185,7 +185,7 @@ public class LoginUser extends HttpServlet {
 		     		     long stopTime = System.nanoTime();
 			     		 float tt = (stopTime - startTime)/1000000000;
 		     		    }
-		    		   System.out.println("time taken "+ tt);
+		    		  // System.out.println("time taken "+ tt);
 		     		    
 		     		   CloudSim.startSimulation();
 		   			 for (int i = 0; i < listOfCloudFiles.size(); i++) {

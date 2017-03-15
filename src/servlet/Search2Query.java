@@ -47,21 +47,17 @@ public class Search2Query extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		System.out.println("cAme here123");
 				String key=request.getParameter("keyword");
 				String d=request.getParameter("precision");
-				System.out.println("d "+d);
 				Integer di=Integer.parseInt(d);
-			    System.out.println("cAme here");
 			    List<String> dataToBeDisplayed=new ArrayList<String>();
 			    TrieUser2.finalResult=new HashMap<Integer, List< List<Pair<String, Integer>>> >();
 				if(!User.isTrieDictCreated)
 				{	
-					 System.out.println("cAme here");
+
 					TrieUser2.t=new Trie2();
 			     
-			        	  FileReader file_to_read2=new FileReader("D:\\major\\abc\\words.txt"); // you can change file path.
+			        	  FileReader file_to_read2=new FileReader("D:\\major\\abc\\unique_stem_words.txt"); // you can change file path.
 			              Scanner filesc2=new Scanner(file_to_read2);//scanner for file
 			            String line="",token="";
 			              while(filesc2.hasNextLine())
@@ -88,16 +84,16 @@ public class Search2Query extends HttpServlet {
 			        for(int i=0;i<=key.length();i++)
 			        	prevrow[i]=i;
 			        TrieUser2.traversefile(TrieUser2.t.root,temp,di,prevrow,key);
-			        
-			        System.out.println("lengthiiiiiiiiiiiiiiii "+TrieUser2.finalResult.size());
+			      
 			        HashMap<String,Integer> filevisited = new HashMap<String, Integer>();
 	        	    ArrayList<String> uniquefiles = new ArrayList<String>();
+	        	    HashMap<Float,String> ranked = new HashMap<Float,String>();
 			        for(int i=0;i<=di;i++)
 			        {
 			        	if(TrieUser2.finalResult.containsKey(i))
 			        	{
 			        		List< List<Pair<String, Integer>>> wordlist = TrieUser2.finalResult.get(i);
-			        		HashMap<Float,String> ranked = new HashMap<Float,String>();
+			        		
 			        		for(int j=0;j<wordlist.size();j++)
 			        		{
 			        			List<Pair<String,Integer>> indword = wordlist.get(j);
@@ -107,38 +103,42 @@ public class Search2Query extends HttpServlet {
 			        				ranked.put(score(p.getR(),indword.size()), p.getL());
 			        			}
 			        		}
-			        		ArrayList<String> filetodisplay = new ArrayList<String>();
-			        		Iterator it = ranked.entrySet().iterator();
-			        	    while (it.hasNext()) {
-			        	        HashMap.Entry pair = (HashMap.Entry)it.next();
-			        	        filetodisplay.add((String) pair.getValue());
-			        	        it.remove(); // avoids a ConcurrentModificationException
-			        	    }
-			        	    Collections.reverse(filetodisplay);
-			        	  //print file to display here.............
-			        	    for(int j=0;j<filetodisplay.size();j++)
-			        	    {
-			        	    	if(!filevisited.containsKey(filetodisplay.get(j)))
-			        	    	{
-			        	    		System.out.println("hello");
-			        	    		filevisited.put(filetodisplay.get(j), 1);
-			        	    		uniquefiles.add(filetodisplay.get(j));
-			        	    	}
-			        	}
+			        		
 			        }
-			        for(int j=0;j<uniquefiles.size();j++)
-	        	    {
-	        	    	System.out.println(uniquefiles.get(j));
+			        }
+			        
+			        ArrayList<String> filetodisplay = new ArrayList<String>();
+	        		Iterator it = ranked.entrySet().iterator();
+	        	    while (it.hasNext()) {
+	        	        HashMap.Entry pair = (HashMap.Entry)it.next();
+	        	        filetodisplay.add((String) pair.getValue());
+	        	        it.remove(); // avoids a ConcurrentModificationException
 	        	    }
+	        	    Collections.reverse(filetodisplay);
+	        	 
+	        	   // HashMap<String,Integer> filevisited = new HashMap<String, Integer>();
+	        	    for(int j=0;j<filetodisplay.size();j++)
+	        	    {
+	        	    	if(!filevisited.containsKey(filetodisplay.get(j)))
+	        	    	{
+	        	   
+	        	    		filevisited.put(filetodisplay.get(j), 1);
+	        	    		uniquefiles.add(filetodisplay.get(j));
+	        	    	}
+	        	   }
+	        	   
+				   
 			        for(int j=0;j<uniquefiles.size();j++)
 	        	    {
 	        	    	FileInputStream inFile = new FileInputStream(uniquefiles.get(j));
+	        	    	System.out.println(uniquefiles.get(j));
 	        			BufferedInputStream bin = new BufferedInputStream(inFile);
 	        	        int ch;
 	        	        String temptext="";
 	        	        while((ch=bin.read())!=-1) {
 	        	            temptext = temptext + (char)ch;
 	        	        }
+	        	        
 	        	        bin.close();
 	        	        inFile.close();
 	        	        dataToBeDisplayed.add(temptext);
@@ -146,21 +146,22 @@ public class Search2Query extends HttpServlet {
 	        	    	
 	        	    }
 			        Gson gson=new Gson();
-			       
+			       // System.out.println(dataToBeDisplayed);
+			       System.out.println("convertinnnnnnnnnnnng");
+			        //String json=(JSONArray)JSONSerializer.toJSON(objList)
 			        String json = new Gson().toJson(dataToBeDisplayed);
-			        System.out.println("printed "+json);
+			        System.out.println("printed iiiiiiiiiiiiiiiiii"+json);
 
 			        response.setContentType("application/json");
 			        response.setCharacterEncoding("UTF-8");
 			        response.getWriter().write(json);
-	}
 	}
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	Float score(Integer a,Integer b)
 	{
-		return (float) (a+b);
+		return (float) (1+Math.log(a)*Math.log(1+1/b));
 	}
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
 	{
@@ -336,12 +337,10 @@ class TrieUser2
 	    	Integer nwrow[] = calculate(prevrow,word,temp2);
 	    	if(child.isEnd && nwrow[word.length()]<=d)
 	    	{
-	    		System.out.println("distance "+nwrow[word.length()]+" "+temp2);
+	    		//System.out.println("distance "+nwrow[word.length()]+" "+temp2);
 	    		
 	    		 if (BloomObject.hm.get(temp2)!=null) { 
 					
-	    			 System.out.println("surbhi bewakoof"+finalResult.size());
-	    			 
 	    			 	List<Pair<String,Integer>> myList=new ArrayList<Pair<String, Integer>>();
 						
 						myList=BloomObject.hm.get(temp2);
@@ -358,17 +357,9 @@ class TrieUser2
 							inter.add(myList);
 							finalResult.put(nwrow[word.length()],inter);
 						}
-						for(int j=0;j<myList.size();j++)
-						{
-				
-						 System.out.println(myList.get(j).getL()+" "+myList.get(j).getR()+"\n");
+						
 						}
-						}
-						else
-						{
-							System.out.println("Not present\n");	
-						}
-				 
+						
 				       
 	    		
 	    	}
