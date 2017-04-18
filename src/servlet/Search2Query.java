@@ -25,6 +25,7 @@ import com.google.gson.Gson;
 
 import classes.BloomObject;
 import classes.Pair;
+import classes.Stemmer;
 import classes.User;
 
 /**
@@ -49,6 +50,8 @@ public class Search2Query extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 				String key=request.getParameter("keyword");
 				String d=request.getParameter("precision");
+				Stemmer s1 = new Stemmer();
+				key=s1.stem(key);
 				Integer di=Integer.parseInt(d);
 			    List<String> dataToBeDisplayed=new ArrayList<String>();
 			    TrieUser2.finalResult=new HashMap<Integer, List< List<Pair<String, Integer>>> >();
