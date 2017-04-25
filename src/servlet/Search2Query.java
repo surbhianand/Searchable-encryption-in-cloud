@@ -326,7 +326,7 @@ class TrieUser2
 	    	Integer nwrow[] = calculate(prevrow,word,temp2);
 	    	if(child.isEnd && nwrow[word.length()]<=d)
 	    	{
-	    		 if (BloomObject.hm.get(temp2)!=null) { 
+	    		 if (BloomObject.bloomFilter.contains(temp2)) { 
 					
 	    			 	List<Pair<String,Integer>> myList=new ArrayList<Pair<String, Integer>>();
 						

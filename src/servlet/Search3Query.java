@@ -210,7 +210,7 @@ public class Search3Query extends HttpServlet {
 				 if(wd.containsKey(temp))
 				 {
 					 System.out.print("Looking for "+temp+" "+num);
-					 if (BloomObject.hm.get(temp)!=null) { 
+					 if (BloomObject.bloomFilter.contains(temp)) { 
 						 	System.out.println("checked in bloom filter");
 							List<Pair<String,Integer>> myList=new ArrayList<Pair<String, Integer>>();
 							

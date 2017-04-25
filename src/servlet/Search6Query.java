@@ -437,7 +437,7 @@ class TrieUser3
 	    					 String[] partString = getPart.get(in).split("\\s+");
 	    					 int edd=editDistDP(partString[0] ,word, partString[0].length(), word.length());
 	    		    		 if(edd<=d){
-	    		    			 if (BloomObject.hm.get(partString[0])!=null) { 
+	    		    			 if (BloomObject.bloomFilter.contains(partString[0])) { 
 	    		    				 if(Search6Query.indexes.get(edd) != null)
 	    		    				 {
 	    		    					List<String> li= Search6Query.indexes.get(edd);
