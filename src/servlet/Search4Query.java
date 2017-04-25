@@ -27,6 +27,7 @@ import com.google.gson.Gson;
 
 import classes.BloomObject;
 import classes.Pair;
+import classes.Stemmer;
 import classes.User;
 import classes.LRUCache;
 /**
@@ -45,87 +46,110 @@ public class Search4Query extends HttpServlet {
         // TODO Auto-generated constructor stub
     }
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		
-		 
-		/* try {
-	           // BufferedReader in = new BufferedReader(new FileReader(
-	             //       "C:\\Users\\Shubham\\Desktop\\major1\\repeat.txt"));
-	            String str;
-	            long startTime = System.nanoTime();
-	            int count=0;
-	            FileWriter ofstream = new FileWriter("D:\\major\\abc\\repeatcachet.txt");  // after run, you can see the output file in the specified location
-	            BufferedWriter iout = new BufferedWriter(ofstream);
-	            while ((str = in.readLine()) != null) {
-	            		String key=str;
-	    				String d=2;
-	    				System.out.println("d "+d);
-	    				Integer di=2;
-	    			    System.out.println("cAme here hurrrryyyyyyyyy"+ str);
-	    			    if(cache.containsKey(key))
-	    			    {
-	    			    	HashMap<Integer,List< List<Pair<String,Integer>>>> fr = cache.get(key);
-	    			    	cache.put(key, fr);
-	    			    }
-	    			    else
-	    			    {
-	    			    	List<String> dataToBeDisplayed=new ArrayList<String>();
-		    			    TrieUser2.finalResult=new HashMap<Integer, List< List<Pair<String, Integer>>> >();
-		    				if(!User.isTrieDictCreated)
-		    				{	
-		    					 System.out.println("cAme here");
-		    					TrieUser2.t=new Trie2();
-		    			     
-		    			        	  FileReader file_to_read2=new FileReader("D:\\major\\abc\\unique_stem_words.txt"); // you can change file path.
-		    			              Scanner filesc2=new Scanner(file_to_read2);//scanner for file
-		    			            String line="",token="";
-		    			              while(filesc2.hasNextLine())
-		    			              {
-		    			              line=filesc2.nextLine();
-		    			              Scanner linesc=new Scanner(line);//scanner for line
-		    			           
-		    			                  while(linesc.hasNext())
-		    			                  {
-		    			                   token=linesc.next();
-		    			                   TrieUser2.t.insert(token);
-		    			                  
-		    			                  }
-		    			                 
-		    			                  linesc.close();
+		String key=request.getParameter("keyword");
+		String d=request.getParameter("precision");
+		Stemmer s1 = new Stemmer();
+		key=s1.stem(key);
+		List<String> dataToBeDisplayed=new ArrayList<String>();
+		Integer di=Integer.parseInt(d);	
+	   	if(cache.containsKey(key))
+	    {
+	    	HashMap<Integer,List< List<Pair<String,Integer>>>> fr = cache.get(key);
+	    	cache.put(key, fr);
+	    }
+	    else
+	    {
+	    	
+		    TrieUser2.finalResult=new HashMap<Integer, List< List<Pair<String, Integer>>> >();
+		    if(!User.isTrieDictCreated)
+		    {	
+		  		System.out.println("cAme here");
+		    	TrieUser2.t=new Trie2();
+		    	FileReader file_to_read2=new FileReader(User.location_uniquestemwords); // you can change file path.
+		    	Scanner filesc2=new Scanner(file_to_read2);//scanner for file
+		    	String line="",token="";
+		    	while(filesc2.hasNextLine())
+		    	{
+		    		line=filesc2.nextLine();
+		    		Scanner linesc=new Scanner(line);//scanner for line
+		    		while(linesc.hasNext())
+		    		{
+		    			token=linesc.next();
+		    			TrieUser2.t.insert(token);
+		    		}
+		    		linesc.close();
 		    			              
-		    			              }
-		    				
-		    					User.isTrieDictCreated=true;
-		    				}
-		    				
-		    				 String temp = "";
-		    				 Integer prevrow[]=new Integer[key.length()+1];
-		    			        for(int i=0;i<=key.length();i++)
-		    			        	prevrow[i]=i;
-		    			        TrieUser2.traversefile(TrieUser2.t.root,temp,di,prevrow,key);
-		    			        cache.put(key, TrieUser2.finalResult);
-	    			    }    
-	    			count=count+1;
-	    			if(count%50==0)
-	    			{
-	    				long stopTime = System.nanoTime();
-	    				float tt = (stopTime - startTime)/1000000000;
-	    				iout.write("Time taken "+tt);
-			     		 iout.write("\n");
-	    			}
-	            }
-	            in.close();
-	            iout.close();
-	            ofstream.close();
-	            
-	        } catch (IOException e) {
-	        }*/
+		    	}			
+		  		User.isTrieDictCreated=true;
+		    }				
+			String temp = "";
+		 	Integer prevrow[]=new Integer[key.length()+1];
+		    for(int i=0;i<=key.length();i++)
+		    	prevrow[i]=i;
+		    TrieUser2.traversefile(TrieUser2.t.root,temp,di,prevrow,key);
+		    cache.put(key, TrieUser2.finalResult);
+	    }    
+	    HashMap<String,Integer> filevisited = new HashMap<String, Integer>();
+	        	ArrayList<String> uniquefiles = new ArrayList<String>();
+	        	HashMap<Float,String> ranked = new HashMap<Float,String>();
+			    for(int i=0;i<=di;i++)
+			    {
+			       	if(TrieUser2.finalResult.containsKey(i))
+			        {
+			        	List< List<Pair<String, Integer>>> wordlist = TrieUser2.finalResult.get(i);	
+			        	for(int j=0;j<wordlist.size();j++)
+			        	{
+			        		List<Pair<String,Integer>> indword = wordlist.get(j);
+			        		for(int k=0;k<indword.size();k++)
+			        		{
+			        			Pair<String,Integer> p = indword.get(k);
+			        			ranked.put(score(p.getR(),indword.size()), p.getL());
+			        		}
+			        	}	
+			        }
+			    }    
+			    ArrayList<String> filetodisplay = new ArrayList<String>();
+	        	Iterator it = ranked.entrySet().iterator();
+	        	while (it.hasNext()) {
+	        	    HashMap.Entry pair = (HashMap.Entry)it.next();
+	        	    filetodisplay.add((String) pair.getValue());
+	        	    it.remove(); // avoids a ConcurrentModificationException
+	        	}
+	        	Collections.reverse(filetodisplay);
+	        	 
+	        	   // HashMap<String,Integer> filevisited = new HashMap<String, Integer>();
+	        	for(int j=0;j<filetodisplay.size();j++){
+	        	   	if(!filevisited.containsKey(filetodisplay.get(j)))
+	        	    {
+	        	   	    filevisited.put(filetodisplay.get(j), 1);
+	        	    	uniquefiles.add(filetodisplay.get(j));
+	        	    }
+	        	}   
+			    for(int j=0;j<uniquefiles.size();j++){
+	        	    FileInputStream inFile = new FileInputStream(uniquefiles.get(j));
+	        	    System.out.println(uniquefiles.get(j));
+	        		BufferedInputStream bin = new BufferedInputStream(inFile);
+	        	    int ch;
+	        	    String temptext="";
+	        	    while((ch=bin.read())!=-1) {
+	        	            temptext = temptext + (char)ch;
+	        	    }    
+	        	    bin.close();
+	        	    inFile.close();
+	        	    dataToBeDisplayed.add(temptext);	
+	        	}
+			    Gson gson=new Gson();
+			    String json = new Gson().toJson(dataToBeDisplayed);
+			    response.setContentType("application/json");
+			    response.setCharacterEncoding("UTF-8");
+			    response.getWriter().write(json);
 	}
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	Float score(Integer a,Integer b)
 	{
-		return (float) (a+b);
+		return (float) (1+Math.log(a)*Math.log(1+1/b));
 	}
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
 	{

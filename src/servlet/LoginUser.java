@@ -115,31 +115,14 @@ public class LoginUser extends HttpServlet {
 		         String psw = rs.getString("Password");
 		         if(email.equals(EnteredEmail)&&psw.equals(EnteredPassword))
 		         {
-		        	 /*
-		     		BloomierObject.originalMap= new HashMap<String, List<Pair<String,Integer>>>();
-		     		List<Pair<String,Integer>> l2 = new ArrayList<Pair<String,Integer>>();
-		         	Pair<String,Integer> p3=new Pair<String,Integer>("hey3",3);
-		         	Pair<String,Integer> p4=new Pair<String,Integer>("hey4",4);
-		         	l2.add(p3);
-		         	l2.add(p4);
-		             BloomierObject.originalMap.put("key2", l2);
-
-		         try {
-		         	BloomierObject.bloomierFilter = new MutableBloomierFilter<String, List<Pair<String,Integer>>>(BloomierObject.originalMap, BloomierObject.originalMap.keySet().size() * 3000000, 100, 320,10000);
-		     	} catch (TimeoutException e) {
-		     		// TODO Auto-generated catch block
-		     		e.printStackTrace();
-		     	}
-		         
-		         */
 		        	 
 		        	 Log.printLine("Reading files in folder initially");
-		     		File folder = new File("D:\\major\\majordataset");
+		     		File folder = new File(User.location_dataset);// dataset loc here
 		     		File[] listOfFiles = folder.listFiles();
 		     		float maxtime = 0;
 		     		List<CloudFile> listOfCloudFiles =new ArrayList();
 		     		 
-		     		    for (int i = 0; i < 50 && i< listOfFiles.length ; i++) {
+		     		    for (int i = 0; i < 10 && i< listOfFiles.length ; i++) {
 		     		    	long startTime = System.nanoTime();
 		     		    	if (listOfFiles[i].isFile()) {
 		     		    	  String text = "";

@@ -16,7 +16,7 @@ public class spellcheck {
         {
             
             //Read and store the words of the dictionary 
-            BufferedReader dictReader = new BufferedReader(new FileReader("D:\\major\\abc\\unique_stem_words.txt"));
+            BufferedReader dictReader = new BufferedReader(new FileReader(User.location_uniquestemwords));
             
             while (dictReader.ready()) 
             {
@@ -60,19 +60,15 @@ public class spellcheck {
         String wordCheck, unpunctWord;
         String word = wordToCheck.toLowerCase();
         
-        // if word is found in dictionary then it is spelt correctly, so return as it is.
-        //note: inflections like "es","ing" provided in the dictionary itself.
+        
         if ((wordCheck = (String)dictionary.get(word)) != null)
         {
             suggestWord = false;            // no need to ask for suggestion for a correct word.
             return wordCheck;
         }
         
-        // Removing punctuations at end of word and giving it a shot ("." or "." or "?!")
         int length = word.length();
         
- 
-         //Checking for the beginning of quotes(example: "she )
         if (length > 1 && word.substring(0,1).equals("\"")) 
         {
             unpunctWord = word.substring(1, length);

@@ -50,10 +50,9 @@ import classes.BloomierObject;
 import classes.Pair;
 import classes.Stemmer;
 import classes.Stopwords;
+import classes.User;
 
-/**
- * Servlet implementation class SearchQuery
- */
+
 @WebServlet("/SearchQuery")
 public class SearchQuery extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -69,9 +68,8 @@ public class SearchQuery extends HttpServlet {
         // TODO Auto-generated constructor stub
     }
     public static boolean check_for_word() {
-        // System.out.println(word);
         try {
-            BufferedReader in = new BufferedReader(new FileReader("D:\\major\\abc\\unique_stem_words.txt"));
+            BufferedReader in = new BufferedReader(new FileReader(User.location_uniquestemwords));
             String str;
             while ((str = in.readLine()) != null) {
                 wd.put(str,1);
@@ -84,11 +82,7 @@ public class SearchQuery extends HttpServlet {
     }
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		//response.getWriter().append("Served at: ").append(request.getContextPath());
-		
 		 List<String> dataToBeDisplayed=new ArrayList<String>();
-		System.out.println("came here in wildcard search");
 		String key=request.getParameter("keyword");
 		String d=request.getParameter("precision");
 		Integer di=Integer.parseInt(d);
@@ -153,17 +147,12 @@ public class SearchQuery extends HttpServlet {
 	        	        
 	        	        bin.close();
 	        	        inFile.close();
-	        	        dataToBeDisplayed.add(temptext);
+	        	        dataToBeDisplayed.add(uniquefiles.get(j)+" : "+temptext);
 	        	    	
 	        	    	
 	        	    }
 			        Gson gson=new Gson();
-			       // System.out.println(dataToBeDisplayed);
-			       System.out.println("convertinnnnnnnnnnnng");
-			        //String json=(JSONArray)JSONSerializer.toJSON(objList)
 			        String json = new Gson().toJson(dataToBeDisplayed);
-			        System.out.println("printed iiiiiiiiiiiiiiiiii"+json);
-
 			        response.setContentType("application/json");
 			        response.setCharacterEncoding("UTF-8");
 			        response.getWriter().write(json);
@@ -204,42 +193,19 @@ public class SearchQuery extends HttpServlet {
 			 else
 			 {
 				 if(wd.containsKey(temp))
-				 {
-					// System.out.print("Looking for "+temp+" "+num);
-			/*		 if (BloomierObject.bloomierFilter.get(temp)!=null) { 
-						 	
-							List<Pair<String,Integer>> myList=new ArrayList<Pair<String, Integer>>();
-							
-							myList=BloomierObject.bloomierFilter.get(temp);
-							for(int i=0;i<myList.size();i++)
-							{
-					
-							 System.out.println(myList.get(i).getL()+" "+myList.get(i).getR()+"\n");
-							}
-							}
-							else
-							{
-								System.out.println("Not present");	
-							}*/
-					 
-					 
+				 {  
 					 if (BloomObject.hm.get(temp)!=null) { 
-						 	//System.out.println("checked in bloom filter");
 							List<Pair<String,Integer>> myList=new ArrayList<Pair<String, Integer>>();
-							
 							myList=BloomObject.hm.get(temp);
-							//System.out.println("list retreived from bloom filter");
 							
 							if(!finalResult.containsKey(count))
 							{
-								//System.out.println("hash map already contains");
 								List< List<Pair<String,Integer>>> inter = new ArrayList<List<Pair<String, Integer>>>();
 								inter.add(myList);
 								finalResult.put(count,inter);
 							}
 							else
 							{
-								//System.out.println("hash map did'nt contain newly created");
 								List< List<Pair<String,Integer>>> inter = finalResult.get(count);
 								finalResult.remove(count);
 								inter.add(myList);
@@ -250,9 +216,6 @@ public class SearchQuery extends HttpServlet {
 							
 					       
 				 }
-				 
-				 
-				 
 				 
 				 //delete
 				 for(int i=0;i<temp.length();i++)

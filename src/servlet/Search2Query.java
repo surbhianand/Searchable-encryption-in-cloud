@@ -60,7 +60,7 @@ public class Search2Query extends HttpServlet {
 
 					TrieUser2.t=new Trie2();
 			     
-			        	  FileReader file_to_read2=new FileReader("D:\\major\\abc\\unique_stem_words.txt"); // you can change file path.
+			        	  FileReader file_to_read2=new FileReader(User.location_uniquestemwords); // you can change file path.
 			              Scanner filesc2=new Scanner(file_to_read2);//scanner for file
 			            String line="",token="";
 			              while(filesc2.hasNextLine())
@@ -119,7 +119,6 @@ public class Search2Query extends HttpServlet {
 	        	    }
 	        	    Collections.reverse(filetodisplay);
 	        	 
-	        	   // HashMap<String,Integer> filevisited = new HashMap<String, Integer>();
 	        	    for(int j=0;j<filetodisplay.size();j++)
 	        	    {
 	        	    	if(!filevisited.containsKey(filetodisplay.get(j)))
@@ -148,13 +147,8 @@ public class Search2Query extends HttpServlet {
 	        	    	
 	        	    	
 	        	    }
-			        Gson gson=new Gson();
-			       // System.out.println(dataToBeDisplayed);
-			       System.out.println("convertinnnnnnnnnnnng");
-			        //String json=(JSONArray)JSONSerializer.toJSON(objList)
+			        Gson gson=new Gson();			     
 			        String json = new Gson().toJson(dataToBeDisplayed);
-			        System.out.println("printed iiiiiiiiiiiiiiiiii"+json);
-
 			        response.setContentType("application/json");
 			        response.setCharacterEncoding("UTF-8");
 			        response.getWriter().write(json);
@@ -166,14 +160,6 @@ public class Search2Query extends HttpServlet {
 	{
 		return (float) (1+Math.log(a)*Math.log(1+1/b));
 	}
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
-	{
-		
-	   	 
-	   	 
-		
-	}
-	
 	
 	
 }
@@ -340,8 +326,6 @@ class TrieUser2
 	    	Integer nwrow[] = calculate(prevrow,word,temp2);
 	    	if(child.isEnd && nwrow[word.length()]<=d)
 	    	{
-	    		//System.out.println("distance "+nwrow[word.length()]+" "+temp2);
-	    		
 	    		 if (BloomObject.hm.get(temp2)!=null) { 
 					
 	    			 	List<Pair<String,Integer>> myList=new ArrayList<Pair<String, Integer>>();

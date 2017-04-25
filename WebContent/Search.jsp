@@ -29,15 +29,19 @@
    top:0;
    right:0;
   }
+  .shift{
+  display:flex;
+  justify-content:space-between;
+  }
 </style>
 
 <script src="http://code.jquery.com/jquery-latest.min.js"></script>
         <script>
-        $(document).on("click", "#search1", function() {
+$(document).on("click", "#search6", function() {
         	
         	$("#result").html("");
         	$.ajax({
-        		  url: "SearchQuery",
+        		  url: "Search6Query",
         		  type: "get", //send it through get method
         		  dataType: 'json',
         		  cache:false,
@@ -62,9 +66,93 @@
         		}); 
        		
         });
-        
-        
-        
+$(document).on("click", "#search5", function() {
+        	
+        	$("#result").html("");
+        	$.ajax({
+        		  url: "Search5Query",
+        		  type: "get", //send it through get method
+        		  dataType: 'json',
+        		  cache:false,
+        		  data: { 
+        		    keyword:document.getElementById("searchform-keyword").value,
+        		    precision:document.getElementById("searchform-precision").value
+        		  },
+        		  success: function(responseJson) {
+        	
+        			 var $ul = $("<ul>").appendTo($("#result"));
+        		        $.each(responseJson, function(index, item) {
+        		        	 $("<li>").text(item).appendTo($ul); 
+        		        }); 
+        		        
+        		        document.getElementById('searchform-keyword').value = "";
+        		        document.getElementById('searchform-precision').value = "";
+        		      
+        		  },
+        		  error: function(xhr) {
+        		    //Do Something to handle error
+        		  }
+        		}); 
+       		
+        });
+$(document).on("click", "#search4", function() {
+        	
+        	$("#result").html("");
+        	$.ajax({
+        		  url: "Search4Query",
+        		  type: "get", //send it through get method
+        		  dataType: 'json',
+        		  cache:false,
+        		  data: { 
+        		    keyword:document.getElementById("searchform-keyword").value,
+        		    precision:document.getElementById("searchform-precision").value
+        		  },
+        		  success: function(responseJson) {
+        	
+        			 var $ul = $("<ul>").appendTo($("#result"));
+        		        $.each(responseJson, function(index, item) {
+        		        	 $("<li>").text(item).appendTo($ul); 
+        		        }); 
+        		        
+        		        document.getElementById('searchform-keyword').value = "";
+        		        document.getElementById('searchform-precision').value = "";
+        		      
+        		  },
+        		  error: function(xhr) {
+        		    //Do Something to handle error
+        		  }
+        		}); 
+       		
+        });
+$(document).on("click", "#search3", function() {
+	
+	$("#result").html("");
+	$.ajax({
+		  url: "Search3Query",
+		  type: "get", //send it through get method
+		  dataType: 'json',
+		  cache:false,
+		  data: { 
+		    keyword:document.getElementById("searchform-keyword").value,
+		    precision:document.getElementById("searchform-precision").value
+		  },
+		  success: function(responseJson) {
+	
+			 var $ul = $("<ul>").appendTo($("#result"));
+		        $.each(responseJson, function(index, item) {
+		        	 $("<li>").text(item).appendTo($ul); 
+		        }); 
+		        
+		        document.getElementById('searchform-keyword').value = "";
+		        document.getElementById('searchform-precision').value = "";
+		      
+		  },
+		  error: function(xhr) {
+		    //Do Something to handle error
+		  }
+		}); 
+		
+});
         $(document).on("click", "#search2", function() {
         	
         	$("#result").html("");
@@ -94,104 +182,12 @@
         		}); 
        		
         });
-
-        $(document).on("click", "#search3", function() {
-        	
-        	$("#result").html("");
-        	$.ajax({
-        		  url: "Search3Query",
-        		  type: "get", //send it through get method
-        		  dataType: 'json',
-        		  cache:false,
-        		  data: { 
-        		    keyword:document.getElementById("searchform-keyword").value,
-        		    precision:document.getElementById("searchform-precision").value
-        		  },
-        		  success: function(responseJson) {
-        	
-        			 var $ul = $("<ul>").appendTo($("#result"));
-        		        $.each(responseJson, function(index, item) {
-        		        	 $("<li>").text(item).appendTo($ul); 
-        		        }); 
-        		        
-        		        document.getElementById('searchform-keyword').value = "";
-        		        document.getElementById('searchform-precision').value = "";
-        		      
-        		  },
-        		  error: function(xhr) {
-        		    //Do Something to handle error
-        		  }
-        		}); 
-        		
-        }); 
-        
-       
-        $(document).on("click", "#search4", function() {
-        	
-        	$("#result").html("");
-        	$.ajax({
-        		  url: "Search4Query",
-        		  type: "get", //send it through get method
-        		  dataType: 'json',
-        		  cache:false,
-        		  data: { 
-        		    keyword:document.getElementById("searchform-keyword").value,
-        		    precision:document.getElementById("searchform-precision").value
-        		  },
-        		  success: function(responseJson) {
-        	
-        			 var $ul = $("<ul>").appendTo($("#result"));
-        		        $.each(responseJson, function(index, item) {
-        		        	 $("<li>").text(item).appendTo($ul); 
-        		        }); 
-        		        
-        		        document.getElementById('searchform-keyword').value = "";
-        		        document.getElementById('searchform-precision').value = "";
-        		      
-        		  },
-        		  error: function(xhr) {
-        		    //Do Something to handle error
-        		  }
-        		}); 
-       		
-        });
-
- $(document).on("click", "#search5", function() {
-        	
-        	$("#result").html("");
-        	$.ajax({
-        		  url: "Search5Query",
-        		  type: "get", //send it through get method
-        		  dataType: 'json',
-        		  cache:false,
-        		  data: { 
-        		    keyword:document.getElementById("searchform-keyword").value,
-        		    precision:document.getElementById("searchform-precision").value
-        		  },
-        		  success: function(responseJson) {
-        	
-        			 var $ul = $("<ul>").appendTo($("#result"));
-        		        $.each(responseJson, function(index, item) {
-        		        	 $("<li>").text(item).appendTo($ul); 
-        		        }); 
-        		        
-        		        document.getElementById('searchform-keyword').value = "";
-        		        document.getElementById('searchform-precision').value = "";
-        		      
-        		  },
-        		  error: function(xhr) {
-        		    //Do Something to handle error
-        		  }
-        		}); 
-       		
-        });
-   
             
-            $(document).on("click", "#search6", function() {
+            $(document).on("click", "#search1", function() {
             	
             	$("#result").html("");
             	$.ajax({
-            		  url: "Search6Query",
+            		  url: "SearchQuery",
             		  type: "get", //send it through get method
             		  dataType: 'json',
             		  cache:false,
@@ -241,25 +237,17 @@
 				                        	<label class="sr-only" for="form-search">Enter precision here</label>
 				                        	<input type="text" name="precision"  placeholder="Precision..." class="form-search form-control" id="searchform-precision">
 				                        </div>
-				                     
-                                         <button type="button" class="btn" id="search1" name="Technique1" Width="10px">WildCard Based Approach</button>                    
-                                         <br>
-                                         <br>
-                      
-                                         <button type="button" class="btn" id="search2" name="Technique2" Width="10px">Trie Based Approach</button>
-                                          <br>
-                                         <br>
-                                          <button type="button" class="btn" id="search3" name="Technique3" Width="10px">WildCard Based Approach with Caching</button>
-                                          <br>
-                                         <br>
-                                          <button type="button" class="btn" id="search4" name="Technique4" Width="10px">Trie Based Approach with Caching</button>
-                                          <br>
-                                         <br>
-                                          <button type="button" class="btn" id="search5" name="Technique5" Width="10px">Synonym Based</button>
-                                         <br>
-                                         <br>
-                                         <button type="button" class="btn" id="search6" name="Technique6" Width="10px">KNN Search</button>
-                                          
+<div class="shift">
+<button type="button" class="btn" id="search2" name="Technique2" Width="10px">Trie Based Approach</button>&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp;&nbsp;<button type="button" class="btn" id="search1" name="Technique1" Width="10px">WildCard Based Approach</button>
+</div>
+<br>
+<div class="shift">
+<button type="button" class="btn" id="search3" name="Technique3" Width="10px">WildCard Based Approach with Caching</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button type="button" class="btn" id="search4" name="Technique4" Width="10px">Trie Based Approach with Caching</button>
+</div>
+<br>
+<div class="shift">
+<button type="button" class="btn" id="search5" name="Technique5" Width="10px">Synonym Based</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button type="button" class="btn" id="search6" name="Technique6" Width="10px">KNN Based</button>
+</div>
 				                    </form>
 				                    
 				                    

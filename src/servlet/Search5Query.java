@@ -52,6 +52,7 @@ import classes.BloomierObject;
 import classes.Pair;
 import classes.Stemmer;
 import classes.Stopwords;
+import classes.User;
 import classes.spellcheck;
 import classes.wordnet;
 
@@ -64,7 +65,7 @@ public class Search5Query extends HttpServlet {
 	private static SecretKeySpec secretKey;
     private static byte[] key;
     public static HashMap<String,Integer> wd=new HashMap<String,Integer>();
-      
+    public static HashMap<Integer,List< List<Pair<String,Integer>>>> finalResult;
     /**
      * @see HttpServlet#HttpServlet()
      */
@@ -72,220 +73,105 @@ public class Search5Query extends HttpServlet {
         super();
         // TODO Auto-generated constructor stub
     }
-    public static boolean check_for_word() {
-        // System.out.println(word);
-        try {
-            BufferedReader in = new BufferedReader(new FileReader("C:\\Users\\Shubham\\Desktop\\major1\\unique_stem_words.txt"));
-            String str;
-            while ((str = in.readLine()) != null) {
-                wd.put(str,1);
-            }
-            in.close();
-        } catch (IOException e) {
-        }
-
-        return false;
-    }
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-	 */
+   
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		//response.getWriter().append("Served at: ").append(request.getContextPath());
+		
 		String key=request.getParameter("keyword");
 		String d=request.getParameter("precision");
 		spellcheck checker = new spellcheck();
 		wordnet similarity = new wordnet();
+		 HashMap<Integer,List<List<Pair<String,Integer>>>> finalResult=new HashMap<Integer, List< List<Pair<String, Integer>>> >();
+		
+		 List<String> dataToBeDisplayed=new ArrayList<String>();
 		key = checker.getSpell(key);
 		Set<String> set = similarity.getSimilarWords(key);
 		Iterator iter = set.iterator();
 		while (iter.hasNext()) {
-		    System.out.println(iter.next());
-		}
-	}
-
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-	
-	}
-	
-	public HashMap<Integer,List<List<Pair<String,Integer>>>> search(String key,Integer di)
-	{
-		HashMap<Integer,List<List<Pair<String,Integer>>>> finalResult= new HashMap<Integer, List<List<Pair<String, Integer>>>>();
-		 HashMap<String,Integer> hm=new HashMap<String,Integer>();
-		 String input = key;
+		    String temp2=(String) iter.next();
 		 
-		 input.toLowerCase();
-		 check_for_word();
-		 Queue q = new LinkedList();
-		 q.add(input);
-		 q.add("$");
-		 int count=0;
-		 int num=0;
-		 while(!q.isEmpty())
-		 {
-			 Object obj = new Object();
-			 obj  = q.remove();
-			 String temp = obj.toString();
-			 if(num>100000)
-			 {
-				 break;
-			 }
-			 if(temp.equals("$"))
-			 {
-				 if(q.size()!=0)
-				 {
-					 count=count+1;
-					 q.add("$");
-				 }
-				 if(count>di)
-					 break;
-			 }
-			 else
-			 {
-				 if(wd.containsKey(temp))
-				 {
-					 System.out.print("Looking for "+temp+" "+num);
-			/*		 if (BloomierObject.bloomierFilter.get(temp)!=null) { 
-						 	
-							List<Pair<String,Integer>> myList=new ArrayList<Pair<String, Integer>>();
-							
-							myList=BloomierObject.bloomierFilter.get(temp);
-							for(int i=0;i<myList.size();i++)
-							{
+   		 if (BloomObject.hm.get(temp2)!=null) { 
+				
+   			 	List<Pair<String,Integer>> myList=new ArrayList<Pair<String, Integer>>();
 					
-							 System.out.println(myList.get(i).getL()+" "+myList.get(i).getR()+"\n");
-							}
-							}
-							else
-							{
-								System.out.println("Not present");	
-							}*/
-					 
-					 
-					 if (BloomObject.hm.get(temp)!=null) { 
-						 	System.out.println("checked in bloom filter");
-							List<Pair<String,Integer>> myList=new ArrayList<Pair<String, Integer>>();
-							
-							myList=BloomObject.hm.get(temp);
-							System.out.println("list retreived from bloom filter");
-							
-							if(!finalResult.containsKey(count))
-							{
-								System.out.println("hash map already contains");
-								List< List<Pair<String,Integer>>> inter = new ArrayList<List<Pair<String, Integer>>>();
-								inter.add(myList);
-								finalResult.put(count,inter);
-							}
-							else
-							{
-								System.out.println("hash map did'nt contain newly created");
-								List< List<Pair<String,Integer>>> inter = finalResult.get(count);
-								finalResult.remove(count);
-								inter.add(myList);
-								finalResult.put(count,inter);
-							}
-							
-							
-							for(int i=0;i<myList.size();i++)
-							{
+					myList=BloomObject.hm.get(temp2);
+					if(!finalResult.containsKey(1))
+					{
+						List< List<Pair<String,Integer>>> inter = new ArrayList<List<Pair<String, Integer>>>();
+						inter.add(myList);
+						finalResult.put(1,inter);
+					}
+					else
+					{
+						List< List<Pair<String,Integer>>> inter = finalResult.get(1);
+						finalResult.remove(1);
+						inter.add(myList);
+						finalResult.put(1,inter);
+					}
 					
-							 System.out.println(myList.get(i).getL()+" "+myList.get(i).getR()+"\n");
-							}
-							}
-							else
-							{
-								System.out.println("Not present");	
-							}
-					 
-					       
-				 }
-				 
-				 
-				 
-				 
-				 //delete
-				 for(int i=0;i<temp.length();i++)
-				 {
-					 String temp2 = "";
-					 for(int j=0;j<temp.length();j++)
-					 {
-						 if(i!=j)
-						 {
-							 temp2 = temp2 + temp.charAt(j);
-						 }
-					 }
-					 if(!hm.containsKey(temp2) && temp2.length() > 0 )
-					 {
-						 hm.put(temp2, count);
-						 q.add(temp2);
-						 num+=1;
-						 if(num>10000)
-							 break;
-					 }
-				 }
-				 //replace
-				 for(int i=0;i<temp.length();i++)
-				 {
-					 String left = "";
-					 String right = "";
-					 for(int j=0;j<i;j++)
-						 left=left+temp.charAt(j);
-					 for(int j=i+1;j<temp.length();j++)
-						 right=right+temp.charAt(j);
-					 for(char j='a';j<='z';j++)
-					 {
-						 String temp2 = left + j + right;
-						 if(!hm.containsKey(temp2)&& temp2.length()>0)
-						 {
-							 hm.put(temp2, count);
-							 q.add(temp2);
-							 num+=1;
-							 if(num>10000)
-								 break;
-						 }
-					 }
-				 }
-				 //insert
-				 String lefti="";
-				 for(int i=0;i<temp.length();i++)
-				 {
-					 String right = temp.substring(i);
-					 for(char j='a';j<='z';j++)
-					 {
-						 String temp2 = lefti + j + right;
-						 if(!hm.containsKey(temp2)&&temp2.length()>0)
-						 {
-							 hm.put(temp2, count);
-							 q.add(temp2);
-							 num+=1;
-							 if(num>10000)
-								 break;
-						 }
-					 }
-					 lefti = lefti + temp.charAt(i);
-				 }
-				 for(char j='a';j<='z';j++)
-				 {
-					 String temp2 = lefti + j ;
-					 if(!hm.containsKey(temp2)&&temp2.length()>0)
-					 {
-						 hm.put(temp2, count);
-						 q.add(temp2);
-						 num+=1;
-						 if(num>10000)
-							 break;	 
-					 }
-				 }
-			 }
-			 
-			 System.out.println("out of else after checking for "+temp);
-		 }
+					}					
+		}
 		
-	return finalResult;	
 		
+		
+		HashMap<String,Integer> filevisited = new HashMap<String, Integer>();
+	    ArrayList<String> uniquefiles = new ArrayList<String>();
+	    HashMap<Float,String> ranked = new HashMap<Float,String>();
+       
+        		List< List<Pair<String, Integer>>> wordlist = finalResult.get(1);
+        		
+        		for(int j=0;j<wordlist.size();j++)
+        		{
+        			List<Pair<String,Integer>> indword = wordlist.get(j);
+        			for(int k=0;k<indword.size();k++)
+        			{
+        				Pair<String,Integer> p = indword.get(k);
+        				ranked.put(score(p.getR(),indword.size()), p.getL());
+        			}
+        		}
+       
+        
+        ArrayList<String> filetodisplay = new ArrayList<String>();
+		Iterator it = ranked.entrySet().iterator();
+	    while (it.hasNext()) {
+	        HashMap.Entry pair = (HashMap.Entry)it.next();
+	        filetodisplay.add((String) pair.getValue());
+	        it.remove(); 
+	    }
+	    Collections.reverse(filetodisplay);
+	 
+	    for(int j=0;j<filetodisplay.size();j++)
+	    {
+	    	if(!filevisited.containsKey(filetodisplay.get(j)))
+	    	{
+	   
+	    		filevisited.put(filetodisplay.get(j), 1);
+	    		uniquefiles.add(filetodisplay.get(j));
+	    	}
+	   }
+	   
+	   
+        for(int j=0;j<uniquefiles.size();j++)
+	    {
+	    	FileInputStream inFile = new FileInputStream(uniquefiles.get(j));
+	    	System.out.println(uniquefiles.get(j));
+			BufferedInputStream bin = new BufferedInputStream(inFile);
+	        int ch;
+	        String temptext="";
+	        while((ch=bin.read())!=-1) {
+	            temptext = temptext + (char)ch;
+	        }
+	        
+	        bin.close();
+	        inFile.close();
+	        dataToBeDisplayed.add(temptext);
+	    	
+	    	
+	    }
+        Gson gson=new Gson();
+        String json = new Gson().toJson(dataToBeDisplayed);
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write(json);		
 	}
 	
 	Float score(Integer a,Integer b)

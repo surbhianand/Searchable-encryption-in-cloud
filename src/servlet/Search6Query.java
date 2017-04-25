@@ -69,17 +69,16 @@ public class Search6Query extends HttpServlet {
 		  
 		 FileReader file_to_read2 = null;
 		try {
-			file_to_read2 = new FileReader("D:\\major\\abc\\refstrwithaddress2.txt");
+			file_to_read2 = new FileReader(User.location_refstringswithaddress2);
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} 
-	        Scanner filesc2=new Scanner(file_to_read2);//scanner for file
+	        Scanner filesc2=new Scanner(file_to_read2);
 	        TrieUser3.t = new Trie3(); 
 	        while(filesc2.hasNextLine())
 	        {
 	        line=filesc2.nextLine();
-	        Scanner linesc=new Scanner(line);//scanner for line
+	        Scanner linesc=new Scanner(line);
 	            while(linesc.hasNext())
 	            { 	
 	            token=linesc.next();	
@@ -94,7 +93,7 @@ public class Search6Query extends HttpServlet {
 	           
 	            linesc.close();
 	        }
-	        System.out.println("Trie done");
+	       
 	        User.isRefStringTrieCreated=true;
 	}
 		indexes = new HashMap<Integer,List<String>>();
@@ -102,8 +101,7 @@ public class Search6Query extends HttpServlet {
 		 Integer prevrow[]=new Integer[key.length()+1];
 	        for(int i=0;i<=key.length();i++)
 	        	prevrow[i]=i;
-	        System.out.println("loooooooooooooooooooking "+key);
-	        di+=3;
+	       
 	        TrieUser3.traversefile(TrieUser3.t.root,temp,di,prevrow,key);	
 		
 	        
@@ -200,13 +198,8 @@ public class Search6Query extends HttpServlet {
      	        	    	
      	    }
 		        Gson gson=new Gson();
-		       // System.out.println(dataToBeDisplayed);
-		       System.out.println("convertinnnnnnnnnnnng");
-		        //String json=(JSONArray)JSONSerializer.toJSON(objList)
 		        String json = new Gson().toJson(dataToBeDisplayed);
-		        System.out.println("printed iiiiiiiiiiiiiiiiii"+json);
-
-		        response.setContentType("application/json");
+		         response.setContentType("application/json");
 		        response.setCharacterEncoding("UTF-8");
 		        response.getWriter().write(json);
     		
@@ -437,13 +430,13 @@ class TrieUser3
 		        Integer lineno1_int=child.starting;
 		        Integer lineno2_int=child.ending;
 		        
-	    		try (Stream<String> lines = Files.lines(Paths.get("D:\\major\\abc\\partition_strings.txt"))) {
+	    		try (Stream<String> lines = Files.lines(Paths.get(User.location_partitionstrings))) {
 	    			List<String> getPart = lines.skip(lineno1_int-1).limit(lineno2_int-lineno1_int).collect(Collectors.toList());;
 	    			for(int in=0;in<getPart.size();in++){
 	    				if(!getPart.get(in).equals("")){
 	    					 String[] partString = getPart.get(in).split("\\s+");
 	    					 int edd=editDistDP(partString[0] ,word, partString[0].length(), word.length());
-	    		    		 if(edd<=d-3){
+	    		    		 if(edd<=d){
 	    		    			 if (BloomObject.hm.get(partString[0])!=null) { 
 	    		    				 if(Search6Query.indexes.get(edd) != null)
 	    		    				 {
@@ -465,28 +458,7 @@ class TrieUser3
 	    		} catch (IOException e) {
 	    			// TODO Auto-generated catch block
 					e.printStackTrace();
-				}
-	    		
-	    				   
-	    				   
-	    			 	/*List<Pair<String,Integer>> myList=new ArrayList<Pair<String, Integer>>();
-						
-						myList=BloomObject.hm.get(temp2);
-						if(!finalResult.containsKey(nwrow[word.length()]))
-						{
-							List< List<Pair<String,Integer>>> inter = new ArrayList<List<Pair<String, Integer>>>();
-							inter.add(myList);
-							finalResult.put(nwrow[word.length()],inter);
-						}
-						else
-						{
-							List< List<Pair<String,Integer>>> inter = finalResult.get(nwrow[word.length()]);
-							finalResult.remove(nwrow[word.length()]);
-							inter.add(myList);
-							finalResult.put(nwrow[word.length()],inter);
-						}*/
-						
-					
+				}	
 	    	}
 	    	traversefile(child,temp2,d,nwrow,word);
 	    }
@@ -494,4 +466,3 @@ class TrieUser3
 	
 	
 }
-	

@@ -50,6 +50,7 @@ import classes.BloomierObject;
 import classes.Pair;
 import classes.Stemmer;
 import classes.Stopwords;
+import classes.User;
 import classes.LRUCache;
 
 /**
@@ -62,7 +63,7 @@ public class Search3Query extends HttpServlet {
     private static byte[] key;
     public static HashMap<String,Integer> wd=new HashMap<String,Integer>();
     public static LRUCache<String, HashMap<Integer,List<List<Pair<String,Integer>>>>> cache = LRUCache.newInstance(20);  
-    /**
+    /**q
      * @see HttpServlet#HttpServlet()
      */
     public Search3Query() {
@@ -72,7 +73,7 @@ public class Search3Query extends HttpServlet {
     public static boolean check_for_word() {
         // System.out.println(word);
         try {
-            BufferedReader in = new BufferedReader(new FileReader("D:\\major\\abc\\unique_stem_words.txt"));
+            BufferedReader in = new BufferedReader(new FileReader(User.location_uniquestemwords));
             String str;
             while ((str = in.readLine()) != null) {
                 wd.put(str,1);
@@ -88,49 +89,81 @@ public class Search3Query extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		/*//response.getWriter().append("Served at: ").append(request.getContextPath());
-		try {
-            BufferedReader in = new BufferedReader(new FileReader(
-                    "C:\\Users\\Shubham\\Desktop\\major1\\repeat.txt"));
-            String str;
-            long startTime = System.nanoTime();
-            int count=0;
-            FileWriter ofstream = new FileWriter("D:\\major\\abc\\repeatcahcew.txt");  // after run, you can see the output file in the specified location
-            BufferedWriter iout = new BufferedWriter(ofstream);
-            while ((str = in.readLine()) != null) {
-            	List<String> dataToBeDisplayed=new ArrayList<String>();
-        		System.out.println("came here in wildcard search");
-        		String key=str;
-        		//String d=request.getParameter("precision");
-        		Integer di=2;
-        		Stemmer s1 = new Stemmer();
-        		key=s1.stem(key);
-        		HashMap<Integer,List<List<Pair<String,Integer>>>> fr=new HashMap<Integer, List<List<Pair<String, Integer>>>>();
-        		if(cache.containsKey(key))
-        		{
-        			fr = cache.get(key);
-        			cache.put(key,fr);
-        		}
-        		else
-        		{
-        			fr=search(key,di);
-        			cache.put(key,fr);
-        		}	
-        		count=count+1;
-    			if(count%50==0)
-    			{
-    				long stopTime = System.nanoTime();
-    				float tt = (stopTime - startTime)/1000000000;
-    				iout.write("Time taken "+tt);
-		     		 iout.write("\n");
-    			}
-            }
-            in.close();
-            iout.close();
-            ofstream.close();
-            
-        } catch (IOException e) {
-        }*/
+		//response.getWriter().append("Served at: ").append(request.getContextPath());
+		String key=request.getParameter("keyword");
+		String d=request.getParameter("precision");
+		Integer di=Integer.parseInt(d);
+		Stemmer s1 = new Stemmer();
+		key=s1.stem(key);
+        List<String> dataToBeDisplayed=new ArrayList<String>();
+       	HashMap<Integer,List<List<Pair<String,Integer>>>> fr=new HashMap<Integer, List<List<Pair<String, Integer>>>>();
+       	if(cache.containsKey(key))
+        {
+        	fr = cache.get(key);
+        	cache.put(key,fr);
+        }
+        else
+        {
+        	fr=search(key,di);
+        	cache.put(key,fr);
+        }	
+        HashMap<Float,String> ranked = new HashMap<Float,String>();
+		ArrayList<String> uniquefiles = new ArrayList<String>();
+		for(int i=0;i<=di;i++)
+		{
+			if(fr.containsKey(i))
+			{
+			   	List< List<Pair<String, Integer>>> wordlist = fr.get(i);
+			    for(int j=0;j<wordlist.size();j++)
+			    {
+			       	List<Pair<String,Integer>> indword = wordlist.get(j);
+			       	for(int k=0;k<indword.size();k++)
+			        {
+			        	Pair<String,Integer> p = indword.get(k);
+			        	ranked.put(score(p.getR(),indword.size()), p.getL());
+			        }
+			    }
+			        		
+			} 
+			        	    
+		}
+		ArrayList<String> filetodisplay = new ArrayList<String>();
+	    Iterator it = ranked.entrySet().iterator();
+	    while (it.hasNext()) {
+	    	HashMap.Entry pair = (HashMap.Entry)it.next();
+	       	filetodisplay.add((String) pair.getValue());
+	       	it.remove(); // avoids a ConcurrentModificationException
+	       	}
+	       	Collections.reverse(filetodisplay);
+	       	HashMap<String,Integer> filevisited = new HashMap<String, Integer>();
+	       	for(int j=0;j<filetodisplay.size();j++)
+	       	{
+	        	if(!filevisited.containsKey(filetodisplay.get(j)))
+	        	{ 
+	        	   	filevisited.put(filetodisplay.get(j), 1);
+	        	    uniquefiles.add(filetodisplay.get(j));
+	        	}
+	       	}
+	       	for(int j=0;j<uniquefiles.size();j++)
+	       	{
+	        	FileInputStream inFile = new FileInputStream(uniquefiles.get(j));
+	        	System.out.println(uniquefiles.get(j));
+	        	BufferedInputStream bin = new BufferedInputStream(inFile);
+	        	int ch;
+	        	String temptext="";
+	        	while((ch=bin.read())!=-1) {
+	        	        temptext = temptext + (char)ch;
+	        	}
+	        	        
+	       	bin.close();
+	       	inFile.close();
+	        dataToBeDisplayed.add(uniquefiles.get(j)+" : "+temptext);
+	       	}
+			Gson gson=new Gson();
+			String json = new Gson().toJson(dataToBeDisplayed);
+			response.setContentType("application/json");
+			response.setCharacterEncoding("UTF-8");
+			response.getWriter().write(json);
 	}
 
 	/**
@@ -177,23 +210,6 @@ public class Search3Query extends HttpServlet {
 				 if(wd.containsKey(temp))
 				 {
 					 System.out.print("Looking for "+temp+" "+num);
-			/*		 if (BloomierObject.bloomierFilter.get(temp)!=null) { 
-						 	
-							List<Pair<String,Integer>> myList=new ArrayList<Pair<String, Integer>>();
-							
-							myList=BloomierObject.bloomierFilter.get(temp);
-							for(int i=0;i<myList.size();i++)
-							{
-					
-							 System.out.println(myList.get(i).getL()+" "+myList.get(i).getR()+"\n");
-							}
-							}
-							else
-							{
-								System.out.println("Not present");	
-							}*/
-					 
-					 
 					 if (BloomObject.hm.get(temp)!=null) { 
 						 	System.out.println("checked in bloom filter");
 							List<Pair<String,Integer>> myList=new ArrayList<Pair<String, Integer>>();
@@ -424,11 +440,6 @@ public class Search3Query extends HttpServlet {
 				}
 			}
 	    }
-	 
-	   
-	    
-	    
-	    
 }
 
 

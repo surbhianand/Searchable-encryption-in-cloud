@@ -14,7 +14,7 @@ public class wordnet
     static String a[]=new String[2];
     public wordnet()
     {
-    	System.setProperty("wordnet.database.dir", "D:\\major\\abc\\dict");
+    	System.setProperty("wordnet.database.dir", User.location_dict);
     }
     public Set<String> getSimilarWords(String word)
     {

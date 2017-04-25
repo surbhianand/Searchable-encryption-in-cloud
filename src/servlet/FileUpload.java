@@ -42,11 +42,7 @@ import org.cloudbus.cloudsim.examples.CloudHarddriveStorage;
 import classes.BloomierObject;
 import classes.Pair;
 import classes.Stopwords;
-import classes.MutableBloomierFilter;
 
-/**
- * Servlet implementation class FileUpload
- */
 
 @WebServlet("/FileUpload")
 @MultipartConfig()

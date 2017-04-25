@@ -3,8 +3,6 @@ package classes;
 import java.io.*;
 import java.util.regex.Pattern;
 
-import classes.MutableBloomierFilter;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,7 +38,7 @@ public void RemoveStopWords(String file) throws Exception
            //System.out.println("hey there");
            String[] stopwords = new String[2000];
         try {
-        	 FileReader fr=new FileReader("D:\\major\\abc\\stopwords.txt");
+        	 FileReader fr=new FileReader(User.location_stopwords);//stopwordsloc here
              BufferedReader br= new BufferedReader(fr);
              while ((sCurrentLine = br.readLine()) != null){
 
@@ -90,8 +88,6 @@ public void RemoveStopWords(String file) throws Exception
         BufferedWriter out = null;
         Stemmer s1 = new Stemmer();
         Trie trie = new Trie(); 
-        /*Trieuser trieUser=new Trieuser();*/
-        
         try{
         FileReader file_to_read2=new FileReader("intermidiate.txt"); // you can change file path.
         Scanner filesc2=new Scanner(file_to_read2);//scanner for file
